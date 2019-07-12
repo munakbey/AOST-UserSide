@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.cnd.repository">
+    <module_version install_time="1475191373270" last="true" origin="installer" specification_version="1.31.5.1">
+        <file crc="4237735807" name="config/Modules/org-netbeans-modules-cnd-repository.xml"/>
+        <file crc="4200353931" name="modules/locale/org-netbeans-modules-cnd-repository_ja.jar"/>
+        <file crc="2459060298" name="modules/locale/org-netbeans-modules-cnd-repository_pt_BR.jar"/>
+        <file crc="2854336046" name="modules/locale/org-netbeans-modules-cnd-repository_ru.jar"/>
+        <file crc="3906086650" name="modules/locale/org-netbeans-modules-cnd-repository_zh_CN.jar"/>
+        <file crc="3228047280" name="modules/org-netbeans-modules-cnd-repository.jar"/>
+    </module_version>
+</module>

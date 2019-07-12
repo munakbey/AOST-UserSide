@@ -1,0 +1,34 @@
+*****virtual env e girmek
+1-cd enviroments
+2-source my_env/bin/activate
+*****update requirement.txt
+1-pip freeze > requirements.txt
+2-cat requirements.txt
+**installing on env
+pip install  -r requirements.txt
+sudo apt-get install -r requirements.txt build-essential python-dev python-pip
+**-*--**-*-*-*-
+mongodb user yaratma:
+db.createUser( { user: "mng", pwd: "1234", roles: [ { role: "userAdminAnyDatabase", db: "admin" } ] } )
+mongodb giriş:
+mongod
+mongo --port 27017 -u "mng" --authenticationDatabase "admin" -p
+pass:1234
+
+*-*"user" : "user",
+	"roles" : [
+		{
+			"role" : "readWrite",
+			"db" : "python"
+		},
+		{
+			"role" : "read",
+			"db" : "python"
+		}
+	]
+*-*
+giriş :
+cmongod --bind_ip 0.0.0.0
+mongo --port 27017 -u "mng" --authenticationDatabase "admin" -p
+*-*-*--Neo4j*-*-*-
+create(n:Employee{Name:"Eric",Surname:"Lee",Gender:"M"});cd

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.cnd.highlight">
+    <module_version install_time="1475191347563" last="true" origin="installer" specification_version="1.33.7.1.1">
+        <file crc="1812499304" name="config/Modules/org-netbeans-modules-cnd-highlight.xml"/>
+        <file crc="4010417493" name="modules/locale/org-netbeans-modules-cnd-highlight_ja.jar"/>
+        <file crc="2144396976" name="modules/locale/org-netbeans-modules-cnd-highlight_pt_BR.jar"/>
+        <file crc="1462086326" name="modules/locale/org-netbeans-modules-cnd-highlight_ru.jar"/>
+        <file crc="3274098619" name="modules/locale/org-netbeans-modules-cnd-highlight_zh_CN.jar"/>
+        <file crc="2721522023" name="modules/org-netbeans-modules-cnd-highlight.jar"/>
+    </module_version>
+</module>

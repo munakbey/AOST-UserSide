@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.cnd.model.services/1">
+    <module_version install_time="1475191309689" last="true" origin="installer" specification_version="1.47.11.1">
+        <file crc="1311493187" name="config/Modules/org-netbeans-modules-cnd-model-services.xml"/>
+        <file crc="2132311263" name="modules/locale/org-netbeans-modules-cnd-model-services_ja.jar"/>
+        <file crc="3930576334" name="modules/locale/org-netbeans-modules-cnd-model-services_pt_BR.jar"/>
+        <file crc="4126737166" name="modules/locale/org-netbeans-modules-cnd-model-services_ru.jar"/>
+        <file crc="3367781808" name="modules/locale/org-netbeans-modules-cnd-model-services_zh_CN.jar"/>
+        <file crc="2116240180" name="modules/org-netbeans-modules-cnd-model-services.jar"/>
+    </module_version>
+</module>

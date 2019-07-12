@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.cnd.makeproject.ui">
+    <module_version install_time="1475191338283" last="true" origin="installer" specification_version="1.0.14">
+        <file crc="1567146510" name="config/Modules/org-netbeans-modules-cnd-makeproject-ui.xml"/>
+        <file crc="1507101852" name="modules/locale/org-netbeans-modules-cnd-makeproject-ui_ja.jar"/>
+        <file crc="3021097110" name="modules/locale/org-netbeans-modules-cnd-makeproject-ui_pt_BR.jar"/>
+        <file crc="2355888521" name="modules/locale/org-netbeans-modules-cnd-makeproject-ui_ru.jar"/>
+        <file crc="2758933871" name="modules/locale/org-netbeans-modules-cnd-makeproject-ui_zh_CN.jar"/>
+        <file crc="3545551545" name="modules/org-netbeans-modules-cnd-makeproject-ui.jar"/>
+    </module_version>
+</module>

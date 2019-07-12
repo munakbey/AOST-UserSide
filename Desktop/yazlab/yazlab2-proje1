@@ -1,0 +1,1315 @@
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+
+public class TestURLImage {
+
+    public static void main(String[] args) {
+        new TestURLImage();
+    }
+
+    String sql;
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    public Connection getConnection() {
+        String url = "jdbc:mysql://localhost:3306/new_schema?" + "useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+        Properties properties = new Properties();
+        properties.setProperty("user", "root");
+        properties.setProperty("password", "1234");
+        properties.setProperty("useSSL", "false");
+        try {
+            Connection conn;
+            conn = (Connection) DriverManager.getConnection(url, properties);
+
+            ResultSet rs = null;
+            return conn;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public TestURLImage() {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                }
+
+                try {
+                    ArrayList<String> list = new ArrayList<String>();
+                    ArrayList<String> adlar = new ArrayList<String>();
+                    Connection conn = getConnection();
+                    ResultSet rs;
+                    ResultSet result;
+                    Statement st = (Statement) conn.createStatement();
+
+                    result = st.executeQuery(sql);
+  
+                    while (result.next()) {
+                        //System.out.println(result.last());
+                        PreparedStatement psmt = conn.prepareStatement("SELECT * FROM new_schema.KitapBilgileri where ISBN = ? limit 10");
+
+                        psmt.setString(1, result.getString(1));
+                        rs = psmt.executeQuery();
+                        rs.next();
+                        String isbn = "";
+
+                        String path = rs.getString("UrlS");
+                        String ad = rs.getString(2);
+                       
+                        adlar.add(ad);
+                        list.add(path);
+
+                    }
+
+                    URL url = new URL((String) list.get(0));
+                    URL url1 = new URL((String) list.get(1));
+                    URL url2 = new URL((String) list.get(2));
+                    URL url3 = new URL((String) list.get(3));
+                    URL url4 = new URL((String) list.get(4));
+                    URL url5 = new URL((String) list.get(5));
+                    URL url6 = new URL((String) list.get(6));
+                    URL url7 = new URL((String) list.get(7));
+                    URL url8 = new URL((String) list.get(8));
+                    URL url9 = new URL((String) list.get(9));
+
+                    BufferedImage image = ImageIO.read(url);
+                    BufferedImage image1 = ImageIO.read(url1);
+                    BufferedImage image2 = ImageIO.read(url2);
+                    BufferedImage image3 = ImageIO.read(url3);
+                    BufferedImage image4 = ImageIO.read(url4);
+                    BufferedImage image5 = ImageIO.read(url5);
+                    BufferedImage image6 = ImageIO.read(url6);
+                    BufferedImage image7 = ImageIO.read(url7);
+                    BufferedImage image8 = ImageIO.read(url8);
+                    BufferedImage image9 = ImageIO.read(url9);
+
+                    JLabel label = new JLabel(new ImageIcon(image));
+                    label.setText(adlar.get(0));
+                    label.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label1 = new JLabel(new ImageIcon(image1));
+                    label1.setText(adlar.get(1));
+                    label1.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label2 = new JLabel(new ImageIcon(image2));
+                    label2.setText(adlar.get(2));
+                    label2.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label3 = new JLabel(new ImageIcon(image3));
+                    label3.setText(adlar.get(3));
+                    label3.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label4 = new JLabel(new ImageIcon(image4));
+                    label4.setText(adlar.get(4));
+                    label4.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label5 = new JLabel(new ImageIcon(image5));
+                    label5.setText(adlar.get(5));
+                    label5.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label6 = new JLabel(new ImageIcon(image6));
+                    label6.setText(adlar.get(6));
+                    label6.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label7 = new JLabel(new ImageIcon(image7));
+                    label7.setText(adlar.get(7));
+                    label7.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label8 = new JLabel(new ImageIcon(image8));
+                    label8.setText(adlar.get(8));
+                    label8.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+                    JLabel label9 = new JLabel(new ImageIcon(image9));
+                    label9.setText(adlar.get(9));
+                    label9.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+
+
+                    JFrame f = new JFrame();
+                    f.setTitle("EN ÇOK OKUNANLAR");
+                    JPanel panel = new JPanel();
+                    JPanel panel2 = new JPanel();
+                   
+                    EmptyBorder border = new EmptyBorder(5, 20, 5, 20);
+                    LineBorder line = new LineBorder(Color.blue, 2, true);
+                    CompoundBorder compound = new CompoundBorder(line, border);
+                    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                    panel.add(label);
+
+                    panel.add(label1);
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label2);
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label3);
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label4);
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label5);
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label6);
+
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label7);
+
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label8);
+
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label9);
+
+                    panel.add(Box.createVerticalStrut(20));
+
+                    f.add(panel);
+
+                    f.pack();
+
+                    f.setLocation(500, 500);
+                    f.setVisible(true);
+
+                } catch (Exception exp) {
+                    exp.printStackTrace();
+                }
+
+            }
+        }
+        );
+    }
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+public class User {
+    private int id;
+    private String ad;
+    private int vote;
+    private String isbn;
+    private String booktitle;
+    private String bookauthor;
+    private String year;
+    private String publisher;
+    private String Url_s;
+    public User(int id, String ad, int vote) {
+        this.id = id;
+        this.ad = ad;
+        this.vote = vote;
+    }
+
+    public User() {
+    }
+    
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getBooktitle() {
+        return booktitle;
+    }
+
+    public void setBooktitle(String booktitle) {
+        this.booktitle = booktitle;
+    }
+
+    public String getBookauthor() {
+        return bookauthor;
+    }
+
+    public void setBookauthor(String bookauthor) {
+        this.bookauthor = bookauthor;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public String getUrl_s() {
+        return Url_s;
+    }
+
+    public void setUrl_s(String Url_s) {
+        this.Url_s = Url_s;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getAd() {
+        return ad;
+    }
+
+    public int getVote() {
+        return vote;
+    }
+    
+    
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+import javax.swing.ImageIcon;
+
+
+public class tablo {
+    
+    private String isbn;
+    private String booktitle;
+    private String bookauthor;
+    private String year;
+    private String publisher;
+    private String Url_s;
+    public tablo(){}
+    
+    public tablo(String isbn, String booktitle, String bookauthor, String year,String publisher,String url_s){
+    
+        this.isbn =isbn;
+        this.booktitle=booktitle;
+        this.bookauthor=bookauthor;
+        this.year=year;
+        this.publisher=publisher;
+        this.Url_s=url_s;
+       
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getBooktitle() {
+        return booktitle;
+    }
+
+    public void setBooktitle(String booktitle) {
+        this.booktitle = booktitle;
+    }
+
+    public String getBookauthor() {
+        return bookauthor;
+    }
+
+    public void setBookauthor(String bookauthor) {
+        this.bookauthor = bookauthor;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+   
+     public String getMyImage(){
+        return Url_s;
+    }
+     
+      public void setMyImage(String url_s) {
+        this.Url_s= url_s;
+    }
+   
+
+    
+    
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.management.Query;
+
+public class sorgu {
+     
+   public Connection getConnection(){
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://localhost/new_schema", "root","1234");
+        } catch (SQLException ex) {
+            Logger.getLogger(Query.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return con;
+    }
+    
+    public ArrayList<tablo> BindTable(){
+        
+   ArrayList<tablo> list = new ArrayList<tablo>();
+   Connection con = getConnection();
+   Statement st;
+   ResultSet rs;
+   
+   try {
+   st = con.createStatement();
+   rs = st.executeQuery("SELECT ISBN,KitapAdlari,KitapYazari,YayinlanmaYili,Yayimci,UrlS FROM KitapBilgileri");
+   
+   tablo p;
+   while(rs.next()){
+   p = new tablo(
+   rs.getString("ISBN"),
+   rs.getString("KitapAdlari"),
+   rs.getString("KitapYazari"),
+   rs.getString("YayinlanmaYili"),
+   rs.getString("Yayimci"),
+   rs.getString("UrlS")
+   );
+   list.add(p);
+   }
+   
+   } catch (SQLException ex) {
+   Logger.getLogger(sorgu.class.getName()).log(Level.SEVERE, null, ex);
+   }
+   return list;
+   }
+   
+    
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.management.Query;
+
+public class oneriList {
+
+    public Connection getConnection() {
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://localhost/new_schema", "root", "1234");
+        } catch (SQLException ex) {
+            Logger.getLogger(Query.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return con;
+    }
+
+    public ArrayList<tablo> BindTable(ArrayList oneriKitaplar) {
+
+        ArrayList<tablo> list = new ArrayList<tablo>();
+        Connection con = getConnection();
+        Statement st;
+        ResultSet rs;
+
+        try {
+            st = con.createStatement();
+            for (int i = 0; i < oneriKitaplar.size(); i++) {
+
+                PreparedStatement pt = con.prepareStatement("SELECT ISBN,KitapAdlari,KitapYazari,YayinlanmaYili,Yayimci,UrlS FROM KitapBilgileri where ISBN =?");
+                pt.setString(1, (String) oneriKitaplar.get(i));
+                rs = pt.executeQuery();
+
+                tablo p;
+                while (rs.next()) {
+                    p = new tablo(
+                            rs.getString("ISBN"),
+                            rs.getString("KitapAdlari"),
+                            rs.getString("KitapYazari"),
+                            rs.getString("YayinlanmaYili"),
+                            rs.getString("Yayimci"),
+                            rs.getString("UrlS")
+                    );
+                    list.add(p);
+                    
+                }
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(sorgu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return list;
+    }
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
+
+public class oneri {
+
+    String name;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public oneri() {
+    }
+
+    public Connection getConnection() {
+
+        String url = "jdbc:mysql://localhost:3306/new_schema?" + "useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+        Properties properties = new Properties();
+        properties.setProperty("user", "root");
+        properties.setProperty("password", "1234");
+        properties.setProperty("useSSL", "false");
+        try {
+            Connection conn;
+            conn = (Connection) DriverManager.getConnection(url, properties);
+
+            ResultSet rs = null;
+            return conn;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public String getName() {
+        String url = "jdbc:mysql://localhost:3306/new_schema?" + "useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+        Properties properties = new Properties();
+        properties.setProperty("user", "root");
+        properties.setProperty("password", "1234");
+        properties.setProperty("useSSL", "false");
+
+        ArrayList<String> unm = new ArrayList<String>();
+        String usrnm = "";
+
+        try {
+            Connection conn;
+            conn = (Connection) DriverManager.getConnection(url, properties);
+
+            Statement st = (Statement) conn.createStatement();
+            ResultSet rs = null;
+
+            PreparedStatement pr = conn.prepareStatement("SELECT isim FROM deneme  ");
+            rs = pr.executeQuery();
+            while (rs.next()) {
+                unm.add(rs.getString(1));
+            }
+            for (int i = 0; i < unm.size(); i++) {
+                if (i == unm.size() - 1) {
+                    usrnm = unm.get(i);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return usrnm;
+    }
+
+    public void okumasiz() throws SQLException, IOException {
+        Connection conn = getConnection();
+        ResultSet rs;
+
+        int yas;
+        String ev;
+        String nick = getName();
+        ArrayList<String> userAyırma = new ArrayList<String>();
+
+        //Kullanıcı bilgilerini alma kısmı
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM users where UserName = ? ");
+        ps.setString(1, nick);
+        rs = ps.executeQuery();
+        rs.next();
+        yas = rs.getInt("Age");
+        ev = rs.getString("Location");
+        String userid = rs.getString("UserID");
+
+        //kullanıcının okudugu kitapları bulma kısmı
+        ArrayList<String> kitaplar = new ArrayList<String>();
+        //ArrayList<String> kisininOyları = new ArrayList<String>();
+        PreparedStatement findBook = conn.prepareStatement("Select ISBN,BookRating from Oylama where UserID = ?");
+        findBook.setString(1, userid);
+        ResultSet findRs = findBook.executeQuery();
+        while (findRs.next()) {
+            kitaplar.add(findRs.getString(1));
+            kitaplar.add(findRs.getString(2));
+        }
+
+        //kitapoku tablosunu temizleme
+        PreparedStatement temiz = conn.prepareStatement("select puanlar from kitapoku2 order by puanlar desc");
+        ResultSet temizKontrol = temiz.executeQuery();
+        temizKontrol.next();
+        if (temizKontrol.getInt(1) != 0) {
+            PreparedStatement temizle = conn.prepareStatement("UPDATE kitapoku2 SET  puanlar=0 ;");
+            temizle.executeUpdate();
+        }
+        if (kitaplar.size() == 0) {
+            JOptionPane.showMessageDialog(null, "Okudugunuz kitap bulunmamaktadır");
+            PreparedStatement oyVerenleriBul = conn.prepareStatement("Select userid from kitapoku2 group by userid");
+            ResultSet oyVerenler = oyVerenleriBul.executeQuery();
+
+            while (oyVerenler.next()) {
+
+                PreparedStatement yasBulma = conn.prepareStatement("Select Age,Location from users where UserID = ?");
+                yasBulma.setString(1, oyVerenler.getString("userid"));
+                ResultSet yasBul = yasBulma.executeQuery();
+                yasBul.next();
+                int oylayaninYasi = yasBul.getInt(1);
+                if (oylayaninYasi == -1) {
+
+                } else {
+                    if (oylayaninYasi == yas) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 3 where userid = ? ");
+
+                        pt.setString(1, oyVerenler.getString("userid"));
+
+                        pt.executeUpdate();
+                    } else if ((yas - 1) == oylayaninYasi || (yas + 1) == oylayaninYasi) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 2 where userid = ? ");
+                        pt.setString(1, oyVerenler.getString("userid"));
+
+                        pt.executeUpdate();
+                    } else if ((yas - 2) == oylayaninYasi || (yas + 2) == oylayaninYasi) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 1 where userid = ? ");
+                        pt.setString(1, oyVerenler.getString("userid"));
+
+                        pt.executeUpdate();
+                    }
+                }
+
+            }
+
+            PreparedStatement yerVeOy = conn.prepareStatement("Select userid from kitapoku2 group by userid");
+            ResultSet yerKısmı = yerVeOy.executeQuery();
+            int sayac = 0;
+            while (yerKısmı.next()) {
+
+                PreparedStatement yasBulma = conn.prepareStatement("Select Age,Location from users where UserID = ?");
+                yasBulma.setString(1, yerKısmı.getString("userid"));
+                ResultSet yasBul = yasBulma.executeQuery();
+                yasBul.next();
+
+                String bos = yasBul.getString(2);
+
+                String kullanıcınınEvi = yasBul.getString(2);
+                if (kullanıcınınEvi.equals(ev)) {
+                    PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 1 where userid = ? ");
+                    pt.setString(1, yerKısmı.getString("userid"));
+
+                    pt.executeUpdate();
+                }
+                sayac++;
+                if (sayac == 100) {
+                    break;
+                }
+            }
+            PreparedStatement pt = conn.prepareStatement("Select userid,isbn,puanlar from kitapoku2 order by puanlar desc limit 1,500");
+            ResultSet bulma = pt.executeQuery();
+            ArrayList<String> kitapIsbn = new ArrayList<String>();
+            ArrayList<String> kullanıcılar = new ArrayList<String>();
+            bulma.next();
+            int fe =0;
+            if (Integer.valueOf(bulma.getString("puanlar")) == 0) {
+                JOptionPane.showMessageDialog(null, "Onerebileceğimiz kitap bulunmamaktadır");
+            } else {
+                while (bulma.next()) {
+                    if (!bulma.getString(1).equals(userid)) {
+
+                        if (kullanıcılar.size() != 0) {
+
+                            int puan = Integer.valueOf(kullanıcılar.get(kullanıcılar.size() - 1));
+                            int karsılastırma = Integer.valueOf(bulma.getString(3));
+
+                            if (puan > karsılastırma) {
+                                break;
+                            } else {
+                                kitapIsbn.add(bulma.getString(2));
+                            }
+
+                        } else {
+                            kitapIsbn.add(bulma.getString(2));
+                            kullanıcılar.add(bulma.getString(3));
+                        }
+
+                    }
+                    fe++;
+                    if (fe ==11) {
+                        break;
+                    }
+
+                }
+
+                oneriKitap list = new oneriKitap(kitapIsbn);
+                list.populateJTable(kitapIsbn);
+                list.setVisible(true);
+            }
+        } else {
+            //KİTAP OKUDUYSA
+            for (int j = 0; j < kitaplar.size() / 2; j++) {
+                //aynı kitapları oylayanlar
+                ArrayList<String> ayniKitabiOkuyanlar = new ArrayList<String>();
+                ArrayList<String> ayniKitabiOylayanlar = new ArrayList<String>();
+
+                PreparedStatement findUsers = conn.prepareStatement("Select UserID,BookRating from Oylama where ISBN = ?");
+                findUsers.setString(1, kitaplar.get(j));
+                ResultSet findIds = findUsers.executeQuery();
+                while (findIds.next()) {
+                    ayniKitabiOkuyanlar.add(findIds.getString(1));
+                    ayniKitabiOylayanlar.add(findIds.getString(2));
+
+                }
+                for (int i = 0; i < ayniKitabiOkuyanlar.size(); i++) {
+
+                    int kullanıcıOyu = Integer.valueOf(kitaplar.get(j + 1));
+                    int digerInsan = Integer.valueOf(ayniKitabiOylayanlar.get(i));
+                    if (digerInsan == kullanıcıOyu) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 3 where userid = ? ");
+                        pt.setString(1, ayniKitabiOkuyanlar.get(i));
+
+                        pt.executeUpdate();
+                    } else if ((kullanıcıOyu - 1) == digerInsan || (kullanıcıOyu + 1) == digerInsan) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 2 where userid = ? ");
+                        pt.setString(1, ayniKitabiOkuyanlar.get(i));
+
+                        pt.executeUpdate();
+                    } else if ((kullanıcıOyu - 2) == digerInsan || (kullanıcıOyu + 2) == digerInsan) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 1 where userid = ? ");
+                        pt.setString(1, ayniKitabiOkuyanlar.get(i));
+
+                        pt.executeUpdate();
+                    }
+
+                }
+
+            }
+
+            //Yaşlara göre puan verme kısımı
+            PreparedStatement oyVerenleriBul = conn.prepareStatement("Select userid from kitapoku2 where puanlar !=0 group by userid");
+            ResultSet oyVerenler = oyVerenleriBul.executeQuery();
+            int l = 0;
+            while (oyVerenler.next()) {
+
+                PreparedStatement yasBulma = conn.prepareStatement("Select Age,Location from users where UserID = ?");
+                yasBulma.setString(1, oyVerenler.getString("userid"));
+                ResultSet yasBul = yasBulma.executeQuery();
+                yasBul.next();
+                int oylayaninYasi = yasBul.getInt(1);
+                if (oylayaninYasi == -1) {
+
+                } else {
+                    if (oylayaninYasi == yas) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 3 where userid = ? ");
+
+                        pt.setString(1, oyVerenler.getString("userid"));
+
+                        pt.executeUpdate();
+                    } else if ((yas - 1) == oylayaninYasi || (yas + 1) == oylayaninYasi) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 2 where userid = ? ");
+                        pt.setString(1, oyVerenler.getString("userid"));
+
+                        pt.executeUpdate();
+                    } else if ((yas - 2) == oylayaninYasi || (yas + 2) == oylayaninYasi) {
+                        PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 1 where userid = ? ");
+                        pt.setString(1, oyVerenler.getString("userid"));
+
+                        pt.executeUpdate();
+                    }
+                }
+            }
+            //YER BULMAAA
+
+            PreparedStatement yerVeOy = conn.prepareStatement("Select userid from kitapoku2 where puanlar !=0 group by userid");
+            ResultSet yerKısmı = yerVeOy.executeQuery();
+
+            while (yerKısmı.next()) {
+
+                PreparedStatement yasBulma = conn.prepareStatement("Select Age,Location from users where UserID = ?");
+                yasBulma.setString(1, yerKısmı.getString("userid"));
+                ResultSet yasBul = yasBulma.executeQuery();
+                yasBul.next();
+                int b = 0;
+                int c = 0;
+                String[][] bilgiler = new String[1][3];
+                String[][] kisininEvi = new String[1][3];
+                String bos = yasBul.getString(2);
+
+                if (bos.equals(ev)) {
+                    PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 3 where userid = ? ");
+                    pt.setString(1, yerKısmı.getString("userid"));
+
+                    pt.executeUpdate();
+                } else {
+                    if (bos != null && !bos.trim().isEmpty()) {
+
+                        StringTokenizer kullanıcınınLoc = new StringTokenizer(bos, ",");
+                        while (kullanıcınınLoc.hasMoreTokens()) {
+                            String ulke = kullanıcınınLoc.nextToken();
+                            bilgiler[0][b] = ulke;
+                            b++;
+
+                        }
+                        StringTokenizer kisininLoc = new StringTokenizer(ev, ",");
+                        while (kisininLoc.hasMoreTokens()) {
+                            String ulke = kisininLoc.nextToken();
+                            kisininEvi[0][c] = ulke;
+                            c++;
+
+                        }
+
+                        for (int i = 0; i < c; i++) {
+
+                            String kisiEv = kisininEvi[0][i];
+                            String kullanıcıEv = bilgiler[0][i];
+
+                            if (kisiEv.equals(kullanıcıEv)) {
+                                PreparedStatement pt = conn.prepareStatement("Update kitapoku2 set puanlar = puanlar + 1 where userid = ? ");
+
+                                pt.setString(1, yerKısmı.getString("userid"));
+
+                                pt.executeUpdate();
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+            PreparedStatement pt = conn.prepareStatement("Select userid,isbn,puanlar from kitapoku2 order by puanlar desc limit 1,500");
+            ResultSet bulma = pt.executeQuery();
+            ArrayList<String> kitapIsbn = new ArrayList<String>();
+            ArrayList<String> kullanıcılar = new ArrayList<String>();
+            int de=0;
+            while (bulma.next()) {
+                if (!bulma.getString(1).equals(userid)) {
+
+                    if (kullanıcılar.size() != 0) {
+
+                        int puan = Integer.valueOf(kullanıcılar.get(kullanıcılar.size() - 1));
+                        int karsılastırma = Integer.valueOf(bulma.getString(3));
+
+                        if (puan > karsılastırma) {
+                            break;
+                        } else {
+                            kitapIsbn.add(bulma.getString(2));
+                        }
+
+                    } else {
+                        kitapIsbn.add(bulma.getString(2));
+                        kullanıcılar.add(bulma.getString(3));
+                    }
+                    de++;
+                    if (de == 10) {
+                        break;
+                    }
+                }
+
+            }
+
+            oneriKitap list = new oneriKitap(kitapIsbn);
+            list.populateJTable(kitapIsbn);
+            list.setVisible(true);
+
+        }
+    }
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import java.io.File;
+import java.io.IOException;
+import org.apache.pdfbox.cos.COSDocument;
+import org.apache.pdfbox.io.RandomAccessFile;
+import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+
+ public class PDFManager {
+    
+   private PDFParser parser;
+   private PDFTextStripper pdfStripper;
+   private PDDocument pdDoc ;
+   private COSDocument cosDoc ;
+   
+   private String Text ;
+   private String filePath;
+   private File file;
+   int pageNumber;
+    public PDFManager(int sayi) {
+        pageNumber = sayi ;
+    }
+   public String ToText() throws IOException
+   {
+       this.pdfStripper = null;
+       this.pdDoc = null;
+       this.cosDoc = null;
+       
+       file = new File(filePath);
+       parser = new PDFParser(new RandomAccessFile(file,"r"));
+       
+       parser.parse();
+       cosDoc = parser.getDocument();
+       pdfStripper = new PDFTextStripper();
+       pdDoc = new PDDocument(cosDoc);
+       pdDoc.getNumberOfPages();
+       pdfStripper.setStartPage(pageNumber);
+       pdfStripper.setEndPage(pageNumber);
+       
+       
+       Text = pdfStripper.getText(pdDoc);
+       return Text;
+   }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+   
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import javax.swing.Icon;
+import javax.swing.table.AbstractTableModel;
+import static org.bouncycastle.asn1.cms.CMSObjectIdentifiers.data;
+
+
+public class TheModel extends AbstractTableModel {
+
+    private String[] columns;
+    private Object[][] rows;
+    private int kat = 1;
+
+    public int getKat() {
+        return kat;
+    }
+
+    public void setKat(int kat) {
+        this.kat = kat;
+    }
+    
+    public TheModel(){}
+    
+    public TheModel(Object[][] data, String[] columnName){
+    
+        this.rows = data;
+        this.columns = columnName;
+    }
+
+    
+   public Class getColumnClass(int column){
+        
+            return getValueAt(0,column).getClass();
+        
+    }
+    
+    public void removeRow(int row) {
+   
+    fireTableRowsDeleted(row, row);
+}
+
+    public int getRowCount() {
+     return this.rows.length;
+    }
+
+    public int getColumnCount() {
+     return this.columns.length;
+    }
+
+    
+    public Object getValueAt(int rowIndex, int columnIndex) {
+    
+    return this.rows[rowIndex][columnIndex];
+    }
+    public String getColumnName(int col){
+        return this.columns[col];
+    }
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+
+public class enYeni {
+    
+     public Connection getConnection() {
+        String url = "jdbc:mysql://localhost:3306/new_schema?" + "useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+        Properties properties = new Properties();
+        properties.setProperty("user", "root");
+        properties.setProperty("password", "1234");
+        properties.setProperty("useSSL", "false");
+        try {
+            Connection conn;
+            conn = (Connection) DriverManager.getConnection(url, properties);
+
+            ResultSet rs = null;
+            return conn;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+    ArrayList sql;
+
+    public ArrayList getSql() {
+        return sql;
+    }
+
+    public void setSql(ArrayList sql) {
+        this.sql = sql;
+    }
+    
+    
+    public enYeni() {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                }
+
+                try {
+                    ArrayList<String> list = new ArrayList<String>();
+                    ArrayList<String> adlar = new ArrayList<String>();
+                    Connection conn = getConnection();
+                    ResultSet rs;
+                    ResultSet result;
+                    Statement st = (Statement) conn.createStatement();
+
+                    int sayi = sql.size();
+                   
+                    while (sayi != 0) {
+                        
+                        PreparedStatement psmt = conn.prepareStatement("SELECT * FROM new_schema.KitapBilgileri where ISBN = ?");
+                        psmt.setString(1, String.valueOf(sql.get(sayi-1)));
+                        rs = psmt.executeQuery();
+                        rs.next();
+
+                       String path = rs.getString("UrlS");
+                        String ad = rs.getString(2);
+                        adlar.add(ad);
+                        list.add(path);
+                        sayi--;
+                    }
+
+                    URL url = new URL((String) list.get(0));
+                    URL url1 = new URL((String) list.get(1));
+                    URL url2 = new URL((String) list.get(2));
+                    URL url3 = new URL((String) list.get(3));
+                    URL url4 = new URL((String) list.get(4));
+                   
+                    
+
+                    BufferedImage image = ImageIO.read(url);
+                    BufferedImage image1 = ImageIO.read(url1);
+                    BufferedImage image2 = ImageIO.read(url2);
+                    BufferedImage image3 = ImageIO.read(url3);
+                    BufferedImage image4 = ImageIO.read(url4);
+                   
+
+                    JLabel label = new JLabel(new ImageIcon(image));
+                    label.setText(adlar.get(0));
+                    label.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+                    JLabel label1 = new JLabel(new ImageIcon(image1));
+                    label1.setText(adlar.get(1));
+                    label1.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+                    JLabel label2 = new JLabel(new ImageIcon(image2));
+                    label2.setText(adlar.get(2));
+                    label2.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+                    JLabel label3 = new JLabel(new ImageIcon(image3));
+                    label3.setText(adlar.get(3));
+                    label3.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+                    JLabel label4 = new JLabel(new ImageIcon(image4));
+                    label4.setText(adlar.get(4));
+                    label4.addMouseListener(new MouseAdapter() {
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                frame f=new frame();
+                                f.setVisible(true);
+                            } catch (IOException ex) {
+                                Logger.getLogger(TestURLImage.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    });
+                    
+
+                    JFrame f = new JFrame();
+                    f.setTitle("EN Yeniler OKUNANLAR");
+                    JPanel panel = new JPanel();
+                    JPanel panel2 = new JPanel();
+                   
+                    EmptyBorder border = new EmptyBorder(5, 20, 5, 20);
+                    LineBorder line = new LineBorder(Color.blue, 2, true);
+                    CompoundBorder compound = new CompoundBorder(line, border);
+                    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                    panel.add(label);
+
+                    panel.add(label1);
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label2);
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label3);
+                    panel.add(Box.createVerticalStrut(20));
+                    panel.add(label4);
+                    panel.add(Box.createVerticalStrut(20));
+                   
+
+                    
+
+                    f.add(panel);
+
+                    f.pack();
+
+                    f.setLocation(500, 500);
+                    f.setVisible(true);
+
+                } catch (Exception exp) {
+                    exp.printStackTrace();
+                }
+
+            }
+        }
+        );
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE attributes PUBLIC "-//NetBeans//DTD DefaultAttributes 1.0//EN" "http://www.netbeans.org/dtds/attributes-1_0.dtd">
+<attributes version="1.0">
+    <fileobject name="tomcat_autoregistered_instance">
+        <attr name="admin_port" stringvalue="8025"/>
+        <attr name="autoregistered" stringvalue="true"/>
+        <attr name="displayName" stringvalue="Apache Tomcat 8.0.27.0"/>
+        <attr name="httpportnumber" stringvalue="8084"/>
+        <attr name="is_it_bundled_tomcat" stringvalue="true"/>
+        <attr name="monitor_enabled" stringvalue="true"/>
+        <attr name="password" stringvalue="qAewQll7"/>
+        <attr name="url" stringvalue="tomcat80:home=/home/nilufer/apache-tomcat-8.0.27:base=apache-tomcat-8.0.27.0_base"/>
+        <attr name="username" stringvalue="ide"/>
+    </fileobject>
+</attributes>

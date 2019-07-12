@@ -1,0 +1,1135 @@
+
+import java.awt.Dimension;
+import static java.lang.Math.pow;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Random;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+public class randomGiris {
+
+    int satir, sutun, boyut;
+    double determinant;
+    static JFrame frame = new JFrame();
+    static JTextArea txt = new JTextArea(1000, 1000);
+    public static int carpmaSayisi = 0;
+    public static int toplamaSayisi = 0;
+
+
+    public void main() {
+
+        if (!txt.getText().isEmpty()) {
+            txt.setText(null);
+        }
+
+        Random r = new Random(); //random sýnýfý
+        double start = 0;
+        double end = 10;
+      
+
+        satir = r.nextInt(5) + 1;
+        sutun = r.nextInt(5) + 1;
+        while (satir == sutun) {
+
+            satir = r.nextInt(5) + 1;
+            sutun = r.nextInt(5) + 1;
+
+        }
+        double[][] matris = new double[satir][sutun];
+        double[][] transpozmatris = new double[sutun][satir];
+        double[][] carpmatris = new double[satir][sutun];
+        double[][] tersmatris = new double[sutun][sutun];
+        System.out.println("--MATRÝS--");
+        txt.append("--MATRÝS--" + "\n");
+
+        for (int i = 0; i < satir; i++) {
+            {
+                for (int j = 0; j < sutun; j++) {
+                    double random = new Random().nextDouble();
+                    matris[i][j] = start + (random * (end - start));
+
+                    matris[i][j] = Double.valueOf(new DecimalFormat("#.#").format(matris[i][j]).replace(',', '.'));
+                    txt.append(matris[i][j] + "\t");
+                    System.out.print(matris[i][j] + "   ");
+                }
+                txt.append("\n");
+                System.out.println("");
+            }
+        }
+        if (satir < sutun) {
+            boyut = satir;
+        } else {
+            boyut = sutun;
+        }
+        double[][] ektersmatris = new double[boyut][boyut];
+        if (satir > sutun) {
+            transpozmatris = transpoz(matris);
+
+            carpmatris = matriscarp(transpozmatris, matris);
+            determinant = det_bul(carpmatris, sutun);
+
+            determinant = Double.valueOf(new DecimalFormat("#.#").format(determinant).replace(',', '.'));
+            System.out.println("determinanttt:" + determinant);
+            txt.append("determinanttt:" + determinant + "\n");
+            //tersmatris=ters_bul(carpmatris, sutun);
+            //ters_transpoz_carp(tersmatris,transpozmatris);
+            if (sutun == 2 && satir != 1) {
+                tersmatris = ters_bul(carpmatris, sutun);
+                ters_transpoz_carp(tersmatris, transpozmatris);
+            } else if (sutun == 1) {
+                tersmatris = ters_bul(carpmatris, sutun);
+                ters_transpoz_carp(tersmatris, transpozmatris);
+            } else {
+                ektersmatris = ekmatris(carpmatris, sutun);
+                ters_transpoz_carp(ektersmatris, transpozmatris);
+            }
+        } else {
+            transpozmatris = transpoz(matris);
+            carpmatris = matriscarp1(matris, transpozmatris);
+            determinant = det_bul(carpmatris, satir);
+            determinant = Double.valueOf(new DecimalFormat("#.#").format(determinant).replace(',', '.'));
+            System.out.println("det:" + determinant);
+            txt.append("\n" + "determinanttt:" + determinant + "\n");
+            //tersmatris=ters_bul(carpmatris, satir);
+            //ters_transpoz_carp(tersmatris,transpozmatris);
+            if (satir == 2 && sutun != 1) {
+                tersmatris = ters_bul(carpmatris, satir);
+                ters_transpoz_carp(transpozmatris, tersmatris);
+
+            } else if (satir == 1) {
+                tersmatris = ters_bul(carpmatris, satir);
+                ters_transpoz_carp(transpozmatris, tersmatris);
+            } else {
+                ektersmatris = ekmatris(carpmatris, satir);
+                ters_transpoz_carp(transpozmatris, ektersmatris);
+            }
+        }
+
+        txt.append("Toplama/Çýkarma sayisi :" +  toplamaSayisi + "\n");
+        txt.append("Çarpma/Bölme sayisi :" + carpmaSayisi + "\n");
+
+        //txt.setLineWrap(true);
+        txt.setEditable(false);
+        //txt.setMinimumSize(new Dimension(400,500));
+        //txt.setWrapStyleWord(true);
+        JScrollPane scroll = new JScrollPane(txt);
+
+        frame.add(scroll);
+        frame.setSize(500, 500);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+    }
+
+    public double[][] ekmatris(double matris[][], double n) {
+ 
+        if (n == 3) {
+            double[][] ekmatris = new double[3][3];
+            double[][] ekmatristranspoz = new double[3][3];
+            double[][] ekmatristranspozters = new double[3][3];
+            double det;
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    System.out.println("i " + i);
+                    txt.append("i " + i);
+
+                    System.out.println("j " + j);
+                    txt.append("    j " + j + "\n");
+                    //ekbul(matris, n, i, j);
+                    det = det_bul(ekbul(matris, n, i, j), 2);
+                    ekmatris[i][j] = det * pow(-1, i + j);
+
+                    for (int k = 0; k < (i + j); k++) {
+                       carpmaSayisi++;
+                    }
+                    carpmaSayisi++;
+                }
+            }
+            System.out.println("EK MATRÝS");
+            txt.append("EK MATRÝS" + "\n");
+            for (int a = 0; a < 3; a++) {
+                for (int b = 0; b < 3; b++) {
+                    ekmatris[a][b] = Double.valueOf(new DecimalFormat("#.#").format(ekmatris[a][b]).replace(',', '.'));
+                    System.out.print(ekmatris[a][b] + " ");
+                    txt.append(ekmatris[a][b] + " ");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            System.out.println("EK MATRÝS TRANSPOZU");
+            txt.append("EK MATRÝS TRANSPOZU" + "\n");
+            ekmatristranspoz = ektranspoz(ekmatris);
+            for (int a = 0; a < 3; a++) {
+                for (int b = 0; b < 3; b++) {
+                    ekmatristranspoz[a][b] = Double.valueOf(new DecimalFormat("#.#").format(ekmatristranspoz[a][b]).replace(',', '.'));
+                    System.out.print(ekmatristranspoz[a][b] + "\t");
+                    txt.append(ekmatristranspoz[a][b] + " ");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            System.out.println("EK MATRÝS TERSÝ");
+            txt.append("EK MATRÝS TERSÝ" + "\n");
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    ekmatristranspozters[i][j] = ((1 / determinant) * ekmatristranspoz[i][j]);
+                    carpmaSayisi +=2;
+
+                    ekmatristranspozters[i][j] = Double.valueOf(new DecimalFormat("#.#").format(ekmatristranspozters[i][j]).replace(',', '.'));
+                    System.out.print(ekmatristranspozters[i][j] + "      ");
+                    txt.append(ekmatristranspozters[i][j] + "      ");
+
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+
+            return ekmatristranspozters;
+        } else if (n == 4) {
+            double[][] ekmatris = new double[4][4];
+            double[][] ekmatristranspoz = new double[4][4];
+            double[][] ekmatristranspozters = new double[4][4];
+            double det;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    System.out.println("i " + i);
+                    System.out.println("j " + j);
+                    txt.append("i " + i);
+                    txt.append("    j " + j + "\n");
+                    //ekbul(matris, n, i, j);
+                    det = det_bul(ekbul(matris, n, i, j), 3);
+                    ekmatris[i][j] = det * pow(-1, i + j);
+                    for (int k = 0; k < (i + j); k++) {
+                        carpmaSayisi++;
+                    }
+                    carpmaSayisi++;
+
+                }
+            }
+            System.out.println("EK MATRÝS");
+            System.out.println("EK MATRÝS" + "\n");
+            for (int a = 0; a < 4; a++) {
+                for (int b = 0; b < 4; b++) {
+                    ekmatris[a][b] = Double.valueOf(new DecimalFormat("#.#").format(ekmatris[a][b]).replace(',', '.'));
+                    System.out.print(ekmatris[a][b] + "\t");
+                    txt.append(ekmatris[a][b] + "\t");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            System.out.println("EK MATRÝS TRANSPOZU");
+            txt.append("EK MATRÝS TRANSPOZU" + "\n");
+            ekmatristranspoz = ektranspoz(ekmatris);
+            for (int a = 0; a < 4; a++) {
+                for (int b = 0; b < 4; b++) {
+                    ekmatristranspoz[a][b] = Double.valueOf(new DecimalFormat("#.#").format(ekmatristranspoz[a][b]).replace(',', '.'));
+                    System.out.print(ekmatristranspoz[a][b] + "\t");
+                    txt.append(ekmatristranspoz[a][b] + "\t");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            System.out.println("EK MATRÝS TERSÝ");
+            txt.append("EK MATRÝS TERSÝ" + "\n");
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    ekmatristranspozters[i][j] = ((1 / determinant) * ekmatristranspoz[i][j]);
+                    ekmatristranspozters[i][j] = Double.valueOf(new DecimalFormat("#.#").format(ekmatristranspozters[i][j]).replace(',', '.'));
+                    System.out.print(ekmatristranspozters[i][j] + "\t");
+                    txt.append(ekmatristranspozters[i][j] + "\t");
+                    carpmaSayisi +=2;
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+          
+            return ekmatristranspozters;
+        }
+      
+        return null;
+    }
+
+    public double[][] ekbul(double matris[][], double n, int satirr, int sutunn) {
+        if (n == 3) {
+            double[][] ekmatris = new double[2][2];
+            ArrayList<Double> list = new ArrayList<Double>();
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i != satirr && j != sutunn) {
+                        list.add(matris[i][j]);
+
+                    }
+                }
+            }
+            ekmatris[0][0] = list.get(0);
+            ekmatris[0][1] = list.get(1);
+            ekmatris[1][0] = list.get(2);
+            ekmatris[1][1] = list.get(3);
+            System.out.println(det_bul(ekmatris, 2));
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 2; j++) {
+                    System.out.print(ekmatris[i][j]);
+                    System.out.print(" ");
+                    txt.append(String.valueOf(ekmatris[i][j]));
+                    txt.append("  ");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            double det = det_bul(ekmatris, 2);
+            det = Double.valueOf(new DecimalFormat("#.#").format(det).replace(',', '.'));
+            System.out.println("determinant : " + det);
+            txt.append("Ek Matris determinantý :" + det + "\n");
+            System.out.println("////////////////////////////////");
+            txt.append("////////////////////////////////" + "\n");
+
+            return ekmatris;
+        }
+
+        if (n == 4) {
+            double[][] ekmatris = new double[3][3];
+            ArrayList<Double> list = new ArrayList<Double>();
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i != satirr && j != sutunn) {
+                        list.add(matris[i][j]);
+
+                    }
+                }
+            }
+            ekmatris[0][0] = list.get(0);
+            ekmatris[0][1] = list.get(1);
+            ekmatris[0][2] = list.get(2);
+            ekmatris[1][0] = list.get(3);
+            ekmatris[1][1] = list.get(4);
+            ekmatris[1][2] = list.get(5);
+            ekmatris[2][0] = list.get(6);
+            ekmatris[2][1] = list.get(7);
+            ekmatris[2][2] = list.get(8);
+            System.out.println(det_bul(ekmatris, 3));
+            txt.append(String.valueOf(det_bul(ekmatris, 3)) + "\n");
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    System.out.print(ekmatris[i][j]);
+                    System.out.print(" ");
+                    txt.append(String.valueOf(ekmatris[i][j]));
+                    txt.append("  ");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            double det = det_bul(ekmatris, 3);
+
+            System.out.println("determinant : " + det);
+            det = Double.valueOf(new DecimalFormat("#.#").format(det).replace(',', '.'));
+            txt.append("Ek Matris determinantý :" + det + "\n");
+            System.out.println("////////////////////////////////");
+            txt.append("////////////////////////////////" + "\n");
+
+            return ekmatris;
+        }
+        return null;
+    }
+
+    public double[][] transpoz(double matris[][]) {
+        double[][] transpozmatris = new double[sutun][satir];
+        System.out.println("TRANSPOZU");
+        txt.append("TRANSPOZU" + "\n");
+        for (int i = 0; i < sutun; i++) {
+            for (int j = 0; j < satir; j++) {
+                transpozmatris[i][j] = matris[j][i];
+                System.out.print(transpozmatris[i][j]);
+                System.out.print(" ");
+                txt.append(String.valueOf(transpozmatris[i][j]));
+                txt.append(" ");
+            }
+            System.out.println("");
+            txt.append("\n");
+        }
+
+        return transpozmatris;
+
+    }
+
+    public double[][] ektranspoz(double matris[][]) {
+
+        double[][] transpozmatris = new double[boyut][boyut];
+        //System.out.println("TRANSPOZU");
+        for (int i = 0; i < boyut; i++) {
+            for (int j = 0; j < boyut; j++) {
+                transpozmatris[i][j] = matris[j][i];
+                //      System.out.print(transpozmatris[i][j]);
+                //     System.out.print(" ");
+            }
+            //System.out.println("");
+        }
+
+        return transpozmatris;
+    }
+
+    public double[][] matriscarp(double transpoz[][], double matris[][]) {
+
+        double[][] carpimsonuc = new double[sutun][sutun];
+       
+        for (int i = 0; i < sutun; i++) {
+            for (int k = 0; k < sutun; k++) {
+                for (int j = 0; j < satir; j++) {
+                    carpimsonuc[i][k] += transpoz[i][j] * matris[j][k];
+                    toplamaSayisi++;
+                    carpmaSayisi++;
+                }
+            }
+        }
+        System.out.println("CARPÝMÝ (TRANSPOZ x MATRÝS)");
+        txt.append("CARPÝMÝ (TRANSPOZ x MATRÝS)" + "\n");
+        for (int i = 0; i < sutun; i++) {
+            for (int k = 0; k < sutun; k++) {
+
+                carpimsonuc[i][k] = Double.valueOf(new DecimalFormat("#.#").format(carpimsonuc[i][k]).replace(',', '.'));
+                System.out.print(carpimsonuc[i][k]);
+                txt.append(String.valueOf(carpimsonuc[i][k]));
+                txt.append("\t");
+            }
+            System.out.println();
+            txt.append("\n");
+        }
+
+        return carpimsonuc;
+    }
+
+    public double[][] matriscarp1(double matris[][], double transpoz[][]) {
+
+        double[][] carpimsonuc = new double[satir][satir];
+        
+        for (int i = 0; i < satir; i++) {
+            for (int k = 0; k < satir; k++) {
+                for (int j = 0; j < sutun; j++) {
+                    carpimsonuc[i][k] += matris[i][j] * transpoz[j][k];
+                    toplamaSayisi++;
+                    carpmaSayisi++;
+                }
+            }
+        }
+        System.out.println("CARPÝMÝ (TRANSPOZ x MATRÝS)");
+        txt.append("CARPÝMÝ (TRANSPOZ x MATRÝS)" + "\n");
+        for (int i = 0; i < satir; i++) {
+            for (int k = 0; k < satir; k++) {
+
+                carpimsonuc[i][k] = Double.valueOf(new DecimalFormat("#.#").format(carpimsonuc[i][k]).replace(',', '.'));
+                System.out.print(carpimsonuc[i][k]);
+                System.out.print(" ");
+                txt.append(String.valueOf(carpimsonuc[i][k]));
+                txt.append("\t");
+            }
+            System.out.println();
+            txt.append("\n");
+        }
+
+        return carpimsonuc;
+    }
+
+    public double[][] ters_transpoz_carp(double matris[][], double transpoz[][]) {
+       
+        if (satir > sutun) {
+            double[][] carpimsonuc = new double[sutun][satir];
+
+            for (int i = 0; i < sutun; i++) {
+                for (int j = 0; j < satir; j++) {
+                    for (int k = 0; k < sutun; k++) {
+                        carpimsonuc[i][j] = carpimsonuc[i][j] + matris[i][k] * transpoz[k][j];
+                        toplamaSayisi++;
+                       carpmaSayisi++;
+                    }
+                }
+            }
+            System.out.println("SOZDE TERSÝ (TERS x TRANSPOZ)");
+            txt.append("SOZDE TERSÝ (TERS x TRANSPOZ)" + "\n");
+            for (int i = 0; i < sutun; i++) {
+                for (int j = 0; j < satir; j++) {
+                    carpimsonuc[i][j] = Double.valueOf(new DecimalFormat("#.#").format(carpimsonuc[i][j]).replace(',', '.'));
+                    System.out.print(carpimsonuc[i][j] + "\t");
+                    txt.append(carpimsonuc[i][j] + "\t");
+                }
+                System.out.println();
+                txt.append("\n");
+            }
+
+            return carpimsonuc;
+        } else {
+            double[][] carpimsonuc = new double[sutun][satir];
+
+            for (int i = 0; i < sutun; i++) {
+                for (int j = 0; j < satir; j++) {
+                    for (int k = 0; k < satir; k++) {
+                        carpimsonuc[i][j] = carpimsonuc[i][j] + matris[i][k] * transpoz[k][j];
+                        toplamaSayisi++;
+                        carpmaSayisi++;
+                    }
+                }
+            }
+            System.out.println("SOZDE TERSÝ (TERS x TRANSPOZ)");
+            txt.append("SOZDE TERSÝ (TERS x TRANSPOZ)" + "\n");
+            for (int i = 0; i < sutun; i++) {
+                for (int j = 0; j < satir; j++) {
+                    carpimsonuc[i][j] = Double.valueOf(new DecimalFormat("#.#").format(carpimsonuc[i][j]).replace(',', '.'));
+                    System.out.print(carpimsonuc[i][j] + "\t");
+                    txt.append(carpimsonuc[i][j] + "\t");
+                }
+                System.out.println();
+                txt.append("\n");
+            }
+
+            return carpimsonuc;
+        }
+
+    }
+
+    public double det_bul(double a[][], int n) {
+       
+        int p, h, k, i, j;
+        double det = 0;
+        double[][] temp = new double[sutun][sutun];
+        if (n == 1) {
+            return a[0][0];
+        } else if (n == 2) {
+            det = (a[0][0] * a[1][1] - a[0][1] * a[1][0]);
+            carpmaSayisi++;
+            carpmaSayisi++;
+            toplamaSayisi++;
+            return det;
+        } else {
+            for (p = 0; p < n; p++) {
+                h = 0;
+                k = 0;
+
+                for (i = 1; i < n; i++) {
+                    for (j = 0; j < n; j++) {
+                        if (j == p) {
+                            continue;
+                        }
+
+                        temp[h][k] = a[i][j];
+                        k++;
+                        if (k == n - 1) {
+                            h++;
+                            k = 0;
+                        }
+                    }
+                }
+
+                det = (det + a[0][p] * pow(-1, p) * det_bul(temp, n - 1));
+                 toplamaSayisi++;
+                for (int l = 0; l < p; l++) {
+                    carpmaSayisi++;
+                }
+                carpmaSayisi +=2;
+
+            }
+            return det;
+        }
+    }
+
+    public double[][] ters_bul(double matris[][], int n) {
+        double[][] ters = new double[n][n];
+       
+        if (n == 1) {
+            ters[0][0] = 1 / matris[0][0];
+           carpmaSayisi++;
+        } else if (n == 2) {
+            ters[0][0] = matris[1][1];
+            ters[1][1] = matris[0][0];
+            ters[0][1] = matris[1][0] * (-1);
+            ters[1][0] = matris[0][1] * (-1);
+            carpmaSayisi += 2;
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 2; j++) {
+                    String deger = String.valueOf(ters[i][j]);
+                    ters[i][j] = Double.valueOf(new DecimalFormat("#.#").format(ters[i][j]).replace(',', '.'));
+                    System.out.print(ters[i][j]);
+                    System.out.print(" ");
+
+                    txt.append(deger + "\t");
+
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+        }
+        return ters;
+
+    }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+import java.awt.Dimension;
+import static java.lang.Math.pow;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+public class userGiris {
+
+    int satir, sutun, boyut;
+    double determinant;
+    static JFrame frame = new JFrame();
+    static JTextArea txt = new JTextArea(1000, 1000);
+    public static int carpmaSayisi = 0;
+    public static int toplamaSayisi = 0;
+
+    public void main() {
+
+        if (!txt.getText().isEmpty()) {
+            txt.setText(null);
+        }
+
+        Random r = new Random(); //random sýnýfý
+        Scanner scan = new Scanner(System.in);
+        satir = Integer.valueOf(JOptionPane.showInputDialog("Satýr sayisini giriniz"));
+        sutun = Integer.valueOf(JOptionPane.showInputDialog("Sutun sayisini giriniz"));
+        while (satir == sutun || satir > 5 || sutun > 5 || satir == 0 || sutun == 0) {
+            JOptionPane.showMessageDialog(null, "Boyutlar [1,5] arasý olmalý ve satýr sütun eþit olamaz!!");
+            satir = Integer.valueOf(JOptionPane.showInputDialog("Satýr sayisini giriniz"));
+            sutun = Integer.valueOf(JOptionPane.showInputDialog("Sutun sayisini giriniz"));
+        }
+        double[][] matris = new double[satir][sutun];
+        double[][] transpozmatris = new double[sutun][satir];
+        double[][] carpmatris = new double[satir][sutun];
+        double[][] tersmatris = new double[sutun][sutun];
+        System.out.println("--MATRÝS--");
+        txt.append("--MATRÝS--" + "\n");
+        for (int i = 0; i < satir; i++) {
+            for (int j = 0; j < sutun; j++) {
+
+                matris[i][j] = Double.valueOf(JOptionPane.showInputDialog("" + i + "  " + j + "elemaný giriniz"));
+                while(matris[i][j] >9 || matris[i][j] < 1)
+                {
+                    matris[i][j] = Double.valueOf(JOptionPane.showInputDialog("" + i + "  " + j + "elemaný giriniz"+"Eleman [1,9] arasý olmalýdýr!!"));
+                }
+            }
+        }
+        txt.append("GÝRÝLEN MATRÝS" + "\n");
+        for (int i = 0; i < satir; i++) {
+            for (int j = 0; j < sutun; j++) {
+                matris[i][j] = Double.valueOf(new DecimalFormat("#.#").format(matris[i][j]).replace(',', '.'));
+                txt.append(String.valueOf(matris[i][j]) + "\t");
+
+            }
+            txt.append("\n");
+        }
+        if (satir < sutun) {
+            boyut = satir;
+        } else {
+            boyut = sutun;
+        }
+        double[][] ektersmatris = new double[boyut][boyut];
+        if (satir > sutun) {
+            transpozmatris = transpoz(matris);
+
+            carpmatris = matriscarp(transpozmatris, matris);
+            determinant = det_bul(carpmatris, sutun);
+
+            determinant = Double.valueOf(new DecimalFormat("#.#").format(determinant).replace(',', '.'));
+            System.out.println("determinanttt:" + determinant);
+            txt.append("determinanttt:" + determinant + "\n");
+            //tersmatris=ters_bul(carpmatris, sutun);
+            //ters_transpoz_carp(tersmatris,transpozmatris);
+            if (sutun == 2 && satir != 1) {
+                tersmatris = ters_bul(carpmatris, sutun);
+                ters_transpoz_carp(tersmatris, transpozmatris);
+            } else if (sutun == 1) {
+                tersmatris = ters_bul(carpmatris, sutun);
+                ters_transpoz_carp(tersmatris, transpozmatris);
+            } else {
+                ektersmatris = ekmatris(carpmatris, sutun);
+                ters_transpoz_carp(ektersmatris, transpozmatris);
+            }
+        } else {
+            transpozmatris = transpoz(matris);
+            carpmatris = matriscarp1(matris, transpozmatris);
+            determinant = det_bul(carpmatris, satir);
+            determinant = Double.valueOf(new DecimalFormat("#.#").format(determinant).replace(',', '.'));
+            System.out.println("det:" + determinant);
+            txt.append("\n" + "determinanttt:" + determinant + "\n");
+            //tersmatris=ters_bul(carpmatris, satir);
+            //ters_transpoz_carp(tersmatris,transpozmatris);
+            if (satir == 2 && sutun != 1) {
+                tersmatris = ters_bul(carpmatris, satir);
+                ters_transpoz_carp(transpozmatris, tersmatris);
+
+            } else if (satir == 1) {
+                tersmatris = ters_bul(carpmatris, satir);
+                ters_transpoz_carp(transpozmatris, tersmatris);
+            } else {
+                ektersmatris = ekmatris(carpmatris, satir);
+                ters_transpoz_carp(transpozmatris, ektersmatris);
+            }
+        }
+
+        txt.append("Toplama/Çýkarma sayisi :" + toplamaSayisi + "\n");
+        txt.append("Çarpma/Bölme sayisi :" + carpmaSayisi + "\n");
+
+        //txt.setLineWrap(true);
+        txt.setEditable(false);
+        //txt.setMinimumSize(new Dimension(400,500));
+        //txt.setWrapStyleWord(true);
+        JScrollPane scroll = new JScrollPane(txt);
+
+        frame.add(scroll);
+        frame.setSize(500, 500);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+    }
+
+    public double[][] ekmatris(double matris[][], double n) {
+
+        if (n == 3) {
+            double[][] ekmatris = new double[3][3];
+            double[][] ekmatristranspoz = new double[3][3];
+            double[][] ekmatristranspozters = new double[3][3];
+            double det;
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    System.out.println("i " + i);
+                    txt.append("i " + i);
+
+                    System.out.println("j " + j);
+                    txt.append("    j " + j + "\n");
+                    //ekbul(matris, n, i, j);
+                    det = det_bul(ekbul(matris, n, i, j), 2);
+                    ekmatris[i][j] = det * pow(-1, i + j);
+
+                    for (int k = 0; k < (i + j); k++) {
+                        carpmaSayisi++;
+                    }
+                    carpmaSayisi++;
+                }
+            }
+            System.out.println("EK MATRÝS");
+            txt.append("EK MATRÝS" + "\n");
+            for (int a = 0; a < 3; a++) {
+                for (int b = 0; b < 3; b++) {
+                    ekmatris[a][b] = Double.valueOf(new DecimalFormat("#.#").format(ekmatris[a][b]).replace(',', '.'));
+                    System.out.print(ekmatris[a][b] + " ");
+                    txt.append(ekmatris[a][b] + " ");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            System.out.println("EK MATRÝS TRANSPOZU");
+            txt.append("EK MATRÝS TRANSPOZU" + "\n");
+            ekmatristranspoz = ektranspoz(ekmatris);
+            for (int a = 0; a < 3; a++) {
+                for (int b = 0; b < 3; b++) {
+                    ekmatristranspoz[a][b] = Double.valueOf(new DecimalFormat("#.#").format(ekmatristranspoz[a][b]).replace(',', '.'));
+                    System.out.print(ekmatristranspoz[a][b] + "\t");
+                    txt.append(ekmatristranspoz[a][b] + " ");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            System.out.println("EK MATRÝS TERSÝ");
+            txt.append("EK MATRÝS TERSÝ" + "\n");
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    ekmatristranspozters[i][j] = ((1 / determinant) * ekmatristranspoz[i][j]);
+                    carpmaSayisi += 2;
+
+                    ekmatristranspozters[i][j] = Double.valueOf(new DecimalFormat("#.#").format(ekmatristranspozters[i][j]).replace(',', '.'));
+                    System.out.print(ekmatristranspozters[i][j] + "      ");
+                    txt.append(ekmatristranspozters[i][j] + "      ");
+
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+
+            return ekmatristranspozters;
+        } else if (n == 4) {
+            double[][] ekmatris = new double[4][4];
+            double[][] ekmatristranspoz = new double[4][4];
+            double[][] ekmatristranspozters = new double[4][4];
+            double det;
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    System.out.println("i " + i);
+                    System.out.println("j " + j);
+                    txt.append("i " + i);
+                    txt.append("    j " + j + "\n");
+                    //ekbul(matris, n, i, j);
+                    det = det_bul(ekbul(matris, n, i, j), 3);
+                    ekmatris[i][j] = det * pow(-1, i + j);
+                    for (int k = 0; k < (i + j); k++) {
+                        carpmaSayisi++;
+                    }
+                    carpmaSayisi++;
+
+                }
+            }
+            System.out.println("EK MATRÝS");
+            System.out.println("EK MATRÝS" + "\n");
+            for (int a = 0; a < 4; a++) {
+                for (int b = 0; b < 4; b++) {
+                    ekmatris[a][b] = Double.valueOf(new DecimalFormat("#.#").format(ekmatris[a][b]).replace(',', '.'));
+                    System.out.print(ekmatris[a][b] + "\t");
+                    txt.append(ekmatris[a][b] + "\t");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            System.out.println("EK MATRÝS TRANSPOZU");
+            txt.append("EK MATRÝS TRANSPOZU" + "\n");
+            ekmatristranspoz = ektranspoz(ekmatris);
+            for (int a = 0; a < 4; a++) {
+                for (int b = 0; b < 4; b++) {
+                    ekmatristranspoz[a][b] = Double.valueOf(new DecimalFormat("#.#").format(ekmatristranspoz[a][b]).replace(',', '.'));
+                    System.out.print(ekmatristranspoz[a][b] + "\t");
+                    txt.append(ekmatristranspoz[a][b] + "\t");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            System.out.println("EK MATRÝS TERSÝ");
+            txt.append("EK MATRÝS TERSÝ" + "\n");
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    ekmatristranspozters[i][j] = ((1 / determinant) * ekmatristranspoz[i][j]);
+                    ekmatristranspozters[i][j] = Double.valueOf(new DecimalFormat("#.#").format(ekmatristranspozters[i][j]).replace(',', '.'));
+                    System.out.print(ekmatristranspozters[i][j] + "\t");
+                    txt.append(ekmatristranspozters[i][j] + "\t");
+                    carpmaSayisi += 2;
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+
+            return ekmatristranspozters;
+        }
+
+        return null;
+    }
+
+    public double[][] ekbul(double matris[][], double n, int satirr, int sutunn) {
+        if (n == 3) {
+            double[][] ekmatris = new double[2][2];
+            ArrayList<Double> list = new ArrayList<Double>();
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i != satirr && j != sutunn) {
+                        list.add(matris[i][j]);
+
+                    }
+                }
+            }
+            ekmatris[0][0] = list.get(0);
+            ekmatris[0][1] = list.get(1);
+            ekmatris[1][0] = list.get(2);
+            ekmatris[1][1] = list.get(3);
+            System.out.println(det_bul(ekmatris, 2));
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 2; j++) {
+                    System.out.print(ekmatris[i][j]);
+                    System.out.print(" ");
+                    txt.append(String.valueOf(ekmatris[i][j]));
+                    txt.append("  ");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            double det = det_bul(ekmatris, 2);
+            det = Double.valueOf(new DecimalFormat("#.#").format(det).replace(',', '.'));
+            System.out.println("determinant : " + det);
+            txt.append("Ek Matris determinantý :" + det + "\n");
+            System.out.println("////////////////////////////////");
+            txt.append("////////////////////////////////" + "\n");
+
+            return ekmatris;
+        }
+
+        if (n == 4) {
+            double[][] ekmatris = new double[3][3];
+            ArrayList<Double> list = new ArrayList<Double>();
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i != satirr && j != sutunn) {
+                        list.add(matris[i][j]);
+
+                    }
+                }
+            }
+            ekmatris[0][0] = list.get(0);
+            ekmatris[0][1] = list.get(1);
+            ekmatris[0][2] = list.get(2);
+            ekmatris[1][0] = list.get(3);
+            ekmatris[1][1] = list.get(4);
+            ekmatris[1][2] = list.get(5);
+            ekmatris[2][0] = list.get(6);
+            ekmatris[2][1] = list.get(7);
+            ekmatris[2][2] = list.get(8);
+            System.out.println(det_bul(ekmatris, 3));
+            txt.append(String.valueOf(det_bul(ekmatris, 3)) + "\n");
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    System.out.print(ekmatris[i][j]);
+                    System.out.print(" ");
+                    txt.append(String.valueOf(ekmatris[i][j]));
+                    txt.append("  ");
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+            double det = det_bul(ekmatris, 3);
+
+            System.out.println("determinant : " + det);
+            det = Double.valueOf(new DecimalFormat("#.#").format(det).replace(',', '.'));
+            txt.append("Ek Matris determinantý :" + det + "\n");
+            System.out.println("////////////////////////////////");
+            txt.append("////////////////////////////////" + "\n");
+
+            return ekmatris;
+        }
+        return null;
+    }
+
+    public double[][] transpoz(double matris[][]) {
+        double[][] transpozmatris = new double[sutun][satir];
+        System.out.println("TRANSPOZU");
+        txt.append("TRANSPOZU" + "\n");
+        for (int i = 0; i < sutun; i++) {
+            for (int j = 0; j < satir; j++) {
+                transpozmatris[i][j] = matris[j][i];
+                System.out.print(transpozmatris[i][j]);
+                System.out.print(" ");
+                txt.append(String.valueOf(transpozmatris[i][j]));
+                txt.append(" ");
+            }
+            System.out.println("");
+            txt.append("\n");
+        }
+
+        return transpozmatris;
+
+    }
+
+    public double[][] ektranspoz(double matris[][]) {
+
+        double[][] transpozmatris = new double[boyut][boyut];
+        //System.out.println("TRANSPOZU");
+        for (int i = 0; i < boyut; i++) {
+            for (int j = 0; j < boyut; j++) {
+                transpozmatris[i][j] = matris[j][i];
+                //      System.out.print(transpozmatris[i][j]);
+                //     System.out.print(" ");
+            }
+            //System.out.println("");
+        }
+
+        return transpozmatris;
+    }
+
+    public double[][] matriscarp(double transpoz[][], double matris[][]) {
+
+        double[][] carpimsonuc = new double[sutun][sutun];
+
+        for (int i = 0; i < sutun; i++) {
+            for (int k = 0; k < sutun; k++) {
+                for (int j = 0; j < satir; j++) {
+                    carpimsonuc[i][k] += transpoz[i][j] * matris[j][k];
+                    toplamaSayisi++;
+                    carpmaSayisi++;
+                }
+            }
+        }
+        System.out.println("CARPÝMÝ (TRANSPOZ x MATRÝS)");
+        txt.append("CARPÝMÝ (TRANSPOZ x MATRÝS)" + "\n");
+        for (int i = 0; i < sutun; i++) {
+            for (int k = 0; k < sutun; k++) {
+
+                carpimsonuc[i][k] = Double.valueOf(new DecimalFormat("#.#").format(carpimsonuc[i][k]).replace(',', '.'));
+                System.out.print(carpimsonuc[i][k]);
+                txt.append(String.valueOf(carpimsonuc[i][k]));
+                txt.append("\t");
+            }
+            System.out.println();
+            txt.append("\n");
+        }
+
+        return carpimsonuc;
+    }
+
+    public double[][] matriscarp1(double matris[][], double transpoz[][]) {
+
+        double[][] carpimsonuc = new double[satir][satir];
+
+        for (int i = 0; i < satir; i++) {
+            for (int k = 0; k < satir; k++) {
+                for (int j = 0; j < sutun; j++) {
+                    carpimsonuc[i][k] += matris[i][j] * transpoz[j][k];
+                    toplamaSayisi++;
+                    carpmaSayisi++;
+                }
+            }
+        }
+        System.out.println("CARPÝMÝ (TRANSPOZ x MATRÝS)");
+        txt.append("CARPÝMÝ (TRANSPOZ x MATRÝS)" + "\n");
+        for (int i = 0; i < satir; i++) {
+            for (int k = 0; k < satir; k++) {
+
+                carpimsonuc[i][k] = Double.valueOf(new DecimalFormat("#.#").format(carpimsonuc[i][k]).replace(',', '.'));
+                System.out.print(carpimsonuc[i][k]);
+                System.out.print(" ");
+                txt.append(String.valueOf(carpimsonuc[i][k]));
+                txt.append("\t");
+            }
+            System.out.println();
+            txt.append("\n");
+        }
+
+        return carpimsonuc;
+    }
+
+    public double[][] ters_transpoz_carp(double matris[][], double transpoz[][]) {
+
+        if (satir > sutun) {
+            double[][] carpimsonuc = new double[sutun][satir];
+
+            for (int i = 0; i < sutun; i++) {
+                for (int j = 0; j < satir; j++) {
+                    for (int k = 0; k < sutun; k++) {
+                        carpimsonuc[i][j] = carpimsonuc[i][j] + matris[i][k] * transpoz[k][j];
+                        toplamaSayisi++;
+                        carpmaSayisi++;
+                    }
+                }
+            }
+            System.out.println("SOZDE TERSÝ (TERS x TRANSPOZ)");
+            txt.append("SOZDE TERSÝ (TERS x TRANSPOZ)" + "\n");
+            for (int i = 0; i < sutun; i++) {
+                for (int j = 0; j < satir; j++) {
+                    carpimsonuc[i][j] = Double.valueOf(new DecimalFormat("#.#").format(carpimsonuc[i][j]).replace(',', '.'));
+                    System.out.print(carpimsonuc[i][j] + "\t");
+                    txt.append(carpimsonuc[i][j] + "\t");
+                }
+                System.out.println();
+                txt.append("\n");
+            }
+
+            return carpimsonuc;
+        } else {
+            double[][] carpimsonuc = new double[sutun][satir];
+
+            for (int i = 0; i < sutun; i++) {
+                for (int j = 0; j < satir; j++) {
+                    for (int k = 0; k < satir; k++) {
+                        carpimsonuc[i][j] = carpimsonuc[i][j] + matris[i][k] * transpoz[k][j];
+                        toplamaSayisi++;
+                        carpmaSayisi++;
+                    }
+                }
+            }
+            System.out.println("SOZDE TERSÝ (TERS x TRANSPOZ)");
+            txt.append("SOZDE TERSÝ (TERS x TRANSPOZ)" + "\n");
+            for (int i = 0; i < sutun; i++) {
+                for (int j = 0; j < satir; j++) {
+                    carpimsonuc[i][j] = Double.valueOf(new DecimalFormat("#.#").format(carpimsonuc[i][j]).replace(',', '.'));
+                    System.out.print(carpimsonuc[i][j] + "\t");
+                    txt.append(carpimsonuc[i][j] + "\t");
+                }
+                System.out.println();
+                txt.append("\n");
+            }
+
+            return carpimsonuc;
+        }
+
+    }
+
+    public double det_bul(double a[][], int n) {
+
+        int p, h, k, i, j;
+        double det = 0;
+        double[][] temp = new double[sutun][sutun];
+        if (n == 1) {
+            return a[0][0];
+        } else if (n == 2) {
+            det = (a[0][0] * a[1][1] - a[0][1] * a[1][0]);
+            carpmaSayisi++;
+            carpmaSayisi++;
+            toplamaSayisi++;
+            return det;
+        } else {
+            for (p = 0; p < n; p++) {
+                h = 0;
+                k = 0;
+
+                for (i = 1; i < n; i++) {
+                    for (j = 0; j < n; j++) {
+                        if (j == p) {
+                            continue;
+                        }
+
+                        temp[h][k] = a[i][j];
+                        k++;
+                        if (k == n - 1) {
+                            h++;
+                            k = 0;
+                        }
+                    }
+                }
+
+                det = (det + a[0][p] * pow(-1, p) * det_bul(temp, n - 1));
+                toplamaSayisi++;
+                for (int l = 0; l < p; l++) {
+                    carpmaSayisi++;
+                }
+                carpmaSayisi += 2;
+
+            }
+            return det;
+        }
+    }
+
+    public double[][] ters_bul(double matris[][], int n) {
+        double[][] ters = new double[n][n];
+
+        if (n == 1) {
+            ters[0][0] = 1 / matris[0][0];
+            carpmaSayisi++;
+        } else if (n == 2) {
+            ters[0][0] = matris[1][1];
+            ters[1][1] = matris[0][0];
+            ters[0][1] = matris[1][0] * (-1);
+            ters[1][0] = matris[0][1] * (-1);
+            carpmaSayisi += 2;
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 2; j++) {
+                    String deger = String.valueOf(ters[i][j]);
+                    ters[i][j] = Double.valueOf(new DecimalFormat("#.#").format(ters[i][j]).replace(',', '.'));
+                    System.out.print(ters[i][j]);
+                    System.out.print(" ");
+
+                    txt.append(deger + "\t");
+
+                }
+                System.out.println("");
+                txt.append("\n");
+            }
+        }
+        return ters;
+
+    }
+
+}

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ListHaberlerTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:form styleClass="jsfcrud_list_form">
+                <h:panelGroup id="messagePanel" layout="block">
+                    <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+                </h:panelGroup>
+                <h:outputText escape="false" value="#{bundle.ListHaberlerEmpty}" rendered="#{haberlerController.items.rowCount == 0}"/>
+                <h:panelGroup rendered="#{haberlerController.items.rowCount > 0}">
+                    <h:outputText value="#{haberlerController.pagination.pageFirstItem + 1}..#{haberlerController.pagination.pageLastItem + 1}/#{haberlerController.pagination.itemsCount}"/>&nbsp;
+                    <h:commandLink action="#{haberlerController.previous}" value="#{bundle.Previous} #{haberlerController.pagination.pageSize}" rendered="#{haberlerController.pagination.hasPreviousPage}"/>&nbsp;
+                    <h:commandLink action="#{haberlerController.next}" value="#{bundle.Next} #{haberlerController.pagination.pageSize}" rendered="#{haberlerController.pagination.hasNextPage}"/>&nbsp;
+                    <h:dataTable value="#{haberlerController.items}" var="item" border="0" cellpadding="2" cellspacing="0" rowClasses="jsfcrud_odd_row,jsfcrud_even_row" rules="all" style="border:solid 1px">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListHaberlerTitle_haberid}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.haberid}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListHaberlerTitle_haberresim}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.haberresim}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListHaberlerTitle_haberbaslik}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.haberbaslik}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListHaberlerTitle_habericerik}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.habericerik}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListHaberlerTitle_haberturu}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.haberturu}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListHaberlerTitle_tarih}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.tarih}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListHaberlerTitle_likes}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.likes}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListHaberlerTitle_dislike}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dislike}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;"/>
+                            </f:facet>
+                            <h:commandLink action="#{haberlerController.prepareView}" value="#{bundle.ListHaberlerViewLink}"/>
+                            <h:outputText value=" "/>
+                            <h:commandLink action="#{haberlerController.prepareEdit}" value="#{bundle.ListHaberlerEditLink}"/>
+                            <h:outputText value=" "/>
+                            <h:commandLink action="#{haberlerController.destroy}" value="#{bundle.ListHaberlerDestroyLink}"/>
+                        </h:column>
+                    </h:dataTable>
+                </h:panelGroup>
+                <br />
+                <h:commandLink action="#{haberlerController.prepareCreate}" value="#{bundle.ListHaberlerCreateLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.ListHaberlerIndexLink}"/>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

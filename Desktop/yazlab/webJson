@@ -1,0 +1,896 @@
+//news.java
+package com.example.nilufer.webjson;
+
+import android.content.Context;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class news extends AppCompatActivity {
+
+    public ImageView resim;
+    public TextView content;
+    public TextView title;
+    public TextView haberTur;
+    public TextView tarih;
+    public Button like;
+    public Button dislike;
+    public Button viewCount;
+    private static final String URL_DATA="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/getData";
+    private String URL_LikeDislike="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+    public static int haberID;
+    final String aUrl = "http://openweathermap.org/img/w/01d.png";
+    private Context context;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_news);
+        resim = findViewById(R.id.image);
+        title =findViewById(R.id.haberTitle);
+        content =findViewById(R.id.content);
+        haberTur=findViewById(R.id.turu);
+        tarih=findViewById(R.id.tarih);
+        like=findViewById(R.id.like);
+        dislike=findViewById(R.id.dislike);
+        viewCount=findViewById(R.id.viewCount);
+        addLikeDislike(URL_LikeDislike,3);
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addLikeDislike(URL_LikeDislike,1);
+
+            }
+        });
+        dislike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addLikeDislike(URL_LikeDislike,2);
+
+            }
+        });
+       getIntentExtras();
+
+
+    }
+
+
+    public void addLikeDislike(String URL,int nbmr){
+        String UrlLikes = URL_LikeDislike +getIntent().getIntExtra("haberID",0)+"/"+nbmr;
+        StringRequest stringRequest=new StringRequest(Request.Method.GET,UrlLikes,
+                new Response.Listener<String>() {
+
+
+                    @Override
+                    public void onResponse(String response) {
+                        loadData();
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        );
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+
+
+    }
+    public void loadData(){
+        String UrlLikes = URL_LikeDislike +getIntent().getIntExtra("haberID",0)+"/"+1;
+        StringRequest stringRequest=new StringRequest(Request.Method.GET, URL_DATA,
+                new Response.Listener<String>() {
+
+
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+
+                            //JSONObject jsonObject=new JSONObject(response);
+                            JSONArray array=new JSONArray(response);
+                            System.out.println("response kısımı : "+response);
+                            System.out.println("fetch kısımı");
+                            for (int i=0;i<array.length();i++)
+                            {
+                                JSONObject object=array.getJSONObject(i);
+                                ListItem item=new ListItem(object.getInt("dislike"),object.getString("haberResim"),
+                                        object.getString("haber_baslik"),object.getString("haber_icerik"),object.getString("haber_turu")
+                                        ,object.getInt("likes"),String.valueOf(object.getString("tarih")),object.getInt("viewCount"),object.getInt("haberID")
+                                );
+                                System.out.println("dislike :"+object.getInt("dislike")+"haberId :"+object.getString("haberID")+"haberResim :"+object.getString("haberResim")+
+                                        "haberBaslik :"+object.getString("haber_baslik")+"haberDesc :"+object.getString("haber_icerik")+"haberTuru :"+object.getString("haber_turu")+
+                                        "likes"+object.getInt("likes")+"tarih :"+object.getString("tarih"));
+                                if (haberID == object.getInt("haberID")){
+                                setImage(aUrl,object.getString("haber_baslik"),object.getString("haber_icerik"),object.getString("haber_turu"),object.getString("tarih"),object.getInt("dislike"),object.getInt("likes"),object.getInt("viewCount"));
+
+                                }
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        );
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+
+
+    }
+    public void getIntentExtras()
+    {
+        if (getIntent().hasExtra("aUrl" ) && getIntent().hasExtra("haberTitle")){
+            String url=getIntent().getStringExtra("aUrl");
+            String title=getIntent().getStringExtra("haberTitle");
+            String icerik=getIntent().getStringExtra("haberIcerik");
+            String haberTuru=getIntent().getStringExtra("haberTuru");
+            String tarih=getIntent().getStringExtra("haberTarih");
+            int dislike=getIntent().getIntExtra("haberDislike",0);
+            int like=getIntent().getIntExtra("haberLikes",0);
+            int view=getIntent().getIntExtra("haberG",0);
+            haberID=getIntent().getIntExtra("haberID",0);
+            System.out.println(dislike);
+            setImage(url,title,icerik,haberTuru,tarih,dislike,like,view);
+
+        }
+
+    }
+    public void setImage(String aUrl,String haberTitle,String haberIcerik,String haberTuru,String haberTarih,int haberDislike,int haberLike,int view)
+    {
+        Picasso.with(context)
+                .load(aUrl)
+                .fit()
+                .into(resim, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        System.out.println("başarılı2");
+                        // Log something here eg "true"
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+        title.setText(haberTitle);
+        content.setText(haberIcerik);
+        haberTur.setText(haberTuru);
+        tarih.setText(haberTarih);
+        System.out.println(haberDislike);
+        dislike.setText(String.valueOf(haberDislike));
+        like.setText(String.valueOf(haberLike));
+        viewCount.setText(String.valueOf(view));
+    }
+
+
+
+}
+
+///////////////////////////////////////////////////////////
+//activity_news.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="294dp"
+        android:layout_height="91dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="115dp"
+        app:layout_constraintBottom_toTopOf="@+id/content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/haberTitle"
+        tools:ignore="VectorDrawableCompat" />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="292dp"
+        android:layout_height="189dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="160dp"
+        app:layout_constraintBottom_toTopOf="@+id/like"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image" />
+
+    <Button
+        android:id="@+id/like"
+        android:layout_width="86dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/viewCount"
+        android:layout_marginEnd="22dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/dislike"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="22dp" />
+
+    <Button
+        android:id="@+id/viewCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/dislike"
+        android:layout_centerHorizontal="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/dislike"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        app:layout_constraintVertical_bias="0.269" />
+
+    <Button
+        android:id="@+id/dislike"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="83dp"
+        android:layout_marginStart="23dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/viewCount"
+        app:layout_constraintStart_toEndOf="@+id/like"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        app:layout_constraintVertical_bias="1.0"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="23dp" />
+
+    <Button
+        android:id="@+id/back"
+        android:layout_width="63dp"
+        android:layout_height="34dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="14dp"
+        android:text="Geri"
+        app:layout_constraintBottom_toTopOf="@+id/image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.212"
+        tools:ignore="MissingConstraints"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:id="@+id/turu"
+        android:layout_width="115dp"
+        android:layout_height="25dp"
+        android:layout_alignBottom="@+id/back"
+        android:layout_alignParentEnd="true"
+        app:layout_constraintBottom_toTopOf="@+id/haberTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/back"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_alignParentRight="true" />
+
+    <TextView
+        android:id="@+id/tarih"
+        android:layout_width="117dp"
+        android:layout_height="29dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="33dp"
+        android:layout_toEndOf="@+id/viewCount"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewCount"
+        android:layout_toRightOf="@+id/viewCount" />
+
+    <TextView
+        android:id="@+id/haberTitle"
+        android:layout_width="257dp"
+        android:layout_height="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        app:layout_constraintBottom_toTopOf="@+id/image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/back" />
+</RelativeLayout>
+//////////////////////////////////////////////////
+//adapter
+package com.example.nilufer.webjson;
+
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
+import static android.support.v4.content.ContextCompat.startActivity;
+
+public class adapter extends RecyclerView.Adapter<adapter.ViewHolder>{
+
+    private List<ListItem> listItems;
+    private Context context;
+    private static final String URL_DATA="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/getData";
+    private String URL_Like="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+    private String URL_Dislike="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+
+    public adapter(List<ListItem> listItems, Context context) {
+        this.listItems = listItems;
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item,viewGroup,false);
+
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
+        final ListItem listItem=listItems.get(i);
+        Picasso.with(context).setLoggingEnabled(true);
+        final String aUrl = "http://openweathermap.org/img/w/01d.png";
+        System.out.println("url :"+aUrl);
+        Picasso.with(context)
+                .load(aUrl)
+                .fit()
+                .into(viewHolder.imageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        System.out.println("başarılı");
+                        // Log something here eg "true"
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+        viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(context,news.class);
+                intent.putExtra("aUrl",aUrl);
+                intent.putExtra("haberTitle",listItem.getHaberBaslik());
+                intent.putExtra("haberIcerik",listItem.getHaberIcerik());
+                intent.putExtra("haberTuru",listItem.getHaberTuru());
+                intent.putExtra("haberTarih",listItem.getTarih());
+                intent.putExtra("haberID",listItem.getHaberID());
+                intent.putExtra("haberDislike",listItem.getDislike());
+                intent.putExtra("haberLikes",listItem.getLikes());
+                intent.putExtra("haberG",listItem.getViewCount());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                context.startActivity(intent);
+            }
+        });
+        viewHolder.haberTitle.setText(listItem.getHaberBaslik());
+        viewHolder.haberDesc.setText(listItem.getHaberIcerik());
+        viewHolder.haberTuru.setText(listItem.getHaberTuru());
+        viewHolder.haberTarih.setText((CharSequence) listItem.getTarih());
+        viewHolder.goruntulenme.setText(String.valueOf(listItem.getViewCount()));
+        viewHolder.likes.setText(String.valueOf(listItem.getLikes()));
+        viewHolder.dislikes.setText(String.valueOf(listItem.getDislike()));
+        viewHolder.haberID.setText(String.valueOf(listItem.getHaberID()));
+    }
+
+
+
+
+
+    @Override
+    public int getItemCount() {
+        return listItems.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder{
+        public ImageView imageView;
+        public TextView haberTitle;
+        public TextView haberDesc;
+        public TextView haberTuru;
+        public TextView haberTarih;
+        public TextView goruntulenme;
+        public TextView haberID;
+        public Button likes;
+        public Button dislikes;
+        public RelativeLayout relativeLayout;
+
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            imageView =(ImageView)  itemView.findViewById(R.id.imageView);
+            haberTitle = (TextView) itemView.findViewById(R.id.haberTitle);
+            haberDesc = (TextView) itemView.findViewById(R.id.haberDesc);
+            haberTuru = (TextView) itemView.findViewById(R.id.haberTuru);
+            haberTarih = (TextView) itemView.findViewById(R.id.haberTarih);
+            goruntulenme = (TextView) itemView.findViewById(R.id.viewCount);
+            haberID = (TextView) itemView.findViewById(R.id.haberId);
+            likes = (Button) itemView.findViewById(R.id.likes);
+            dislikes = (Button) itemView.findViewById(R.id.dislikes);
+            relativeLayout = (RelativeLayout) itemView.findViewById(R.id.card);
+
+
+
+        }
+    }
+}
+//////////////////////////////////////////////////
+//MainActivity
+package com.example.nilufer.webjson;
+
+import android.app.VoiceInteractor;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.support.v4.content.ContextCompat.startActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private Button sec;
+
+    private TextView filtre;
+    private static String flt;
+    private static final String URL_DATA="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/getData";
+    private static  String URL_Like="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+    private static  String URL_Dislike="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+    private List<ListItem> listItems;
+
+    private static MainActivity instance;
+
+    public static MainActivity getInstance() {
+        return instance;
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        sec = findViewById(R.id.secBtn);
+        filtre = findViewById(R.id.filtre1);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        listItems = new ArrayList<>();
+        adapter = new adapter(listItems,getApplicationContext());
+        sec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                flt=  String.valueOf(filtre.getText());
+                System.out.println("flt : "+flt);
+                loadRecyclerViewData();
+            }
+        });
+
+
+
+
+        System.out.println("saddasdasd");
+
+        recyclerView.setAdapter(adapter);
+
+    }
+
+
+
+    public void loadRecyclerViewData(){
+        System.out.println("method kısımı");
+        StringRequest stringRequest=new StringRequest(Request.Method.GET, URL_DATA,
+                new Response.Listener<String>() {
+
+
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+
+                            //JSONObject jsonObject=new JSONObject(response);
+                            JSONArray array=new JSONArray(response);
+                            System.out.println("response kısımı : "+response);
+                            System.out.println("fetch kısımı");
+                            for (int i=0;i<array.length();i++)
+                            {
+                                JSONObject object=array.getJSONObject(i);
+                                ListItem item=new ListItem(object.getInt("dislike"),object.getString("haberResim"),
+                                        object.getString("haber_baslik"),object.getString("haber_icerik"),object.getString("haber_turu")
+                                        ,object.getInt("likes"),String.valueOf(object.getString("tarih")),object.getInt("viewCount"),object.getInt("haberID")
+                                );
+                                System.out.println("dislike :"+object.getInt("dislike")+"haberId :"+object.getString("haberID")+"haberResim :"+object.getString("haberResim")+
+                                        "haberBaslik :"+object.getString("haber_baslik")+"haberDesc :"+object.getString("haber_icerik")+"haberTuru :"+object.getString("haber_turu")+
+                                        "likes"+object.getInt("likes")+"tarih :"+object.getString("tarih"));
+                               if(flt != null && flt.equalsIgnoreCase(object.getString("haber_turu"))){
+                                   listItems.add(item);
+                               }
+
+                               if(flt.isEmpty()){
+                                   listItems.add(item);
+                               }
+
+                                System.out.println(item);
+                                adapter.notifyDataSetChanged();
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        );
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+
+    }
+}
+///////////////////////////////////////////////////////////////////////
+//list_item.xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="215dp"
+        android:layout_margin="5dp">
+
+        <RelativeLayout
+            android:id="@+id/card"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/dislikes"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/likes"
+                android:layout_marginEnd="73dp"
+                android:layout_marginRight="73dp"
+                android:text="Begenme" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="84dp"
+                android:layout_height="95dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
+                android:padding="4dp" />
+
+            <TextView
+                android:id="@+id/haberTuru"
+                android:layout_width="84dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/dislikes"
+                android:layout_alignLeft="@id/imageView"
+                android:layout_alignStart="@+id/imageView"
+                android:background="@color/colorPrimary"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/haberTarih"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/imageView"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="17dp"
+                android:layout_marginRight="17dp"
+                android:background="@color/colorPrimary"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/haberTitle"
+                android:layout_width="246dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
+            <Button
+                android:id="@+id/likes"
+                android:layout_width="64dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="130dp"
+                android:layout_marginStart="130dp"
+                android:text="Begen" />
+
+            <TextView
+                android:id="@+id/haberDesc"
+                android:layout_width="253dp"
+                android:layout_height="67dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
+
+            <TextView
+                android:id="@+id/viewCount"
+                android:layout_width="49dp"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/haberDesc"
+                android:layout_alignParentBottom="true"
+                android:layout_alignRight="@id/haberDesc"
+                android:layout_marginBottom="19dp" />
+
+            <TextView
+                android:id="@+id/haberId"
+                android:layout_width="38dp"
+                android:layout_height="21dp"
+                android:layout_above="@+id/haberTarih"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="11dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="11dp" />
+
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
+//////////////////////////////////////////
+///activity_main
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    tools:layout_editor_absoluteY="25dp">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="456dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <Button
+            android:id="@+id/secBtn"
+            android:layout_width="0dp"
+            android:layout_height="43dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginEnd="28dp"
+            android:layout_marginRight="28dp"
+            android:text="Seç"
+            app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.71" />
+
+        <EditText
+            android:id="@+id/filtre1"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_marginBottom="21dp"
+            android:layout_marginEnd="63dp"
+            android:layout_marginRight="63dp"
+            android:layout_marginTop="1dp"
+            android:ems="10"
+            android:hint="Haber turu seçiniz"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+            app:layout_constraintEnd_toStartOf="@+id/secBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+</android.support.constraint.ConstraintLayout>
+//////build.gradle(app)
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.example.nilufer.webjson"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.android.volley:volley:1.0.0'
+    implementation 'com.android.support:support-v4:28.1.0'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+
+}
+android {
+    buildToolsVersion '27.0.3'
+}
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == "com.android.support") {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion "26.+"
+            }
+        }
+    }
+}
+///Manifest
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.nilufer.webjson"
+    android:installLocation="preferExternal">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".news"></activity>
+    </application>
+
+</manifest>
+
+
+
+
+
+
+

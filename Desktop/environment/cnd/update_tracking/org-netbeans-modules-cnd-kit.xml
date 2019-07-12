@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.cnd.kit">
+    <module_version install_time="1475191349495" last="true" origin="installer" specification_version="1.30.4.1">
+        <file crc="1198717888" name="VERSION.txt"/>
+        <file crc="1465756219" name="config/Modules/org-netbeans-modules-cnd-kit.xml"/>
+        <file crc="1118832903" name="modules/locale/org-netbeans-modules-cnd-kit_ja.jar"/>
+        <file crc="3722717898" name="modules/locale/org-netbeans-modules-cnd-kit_pt_BR.jar"/>
+        <file crc="179052202" name="modules/locale/org-netbeans-modules-cnd-kit_ru.jar"/>
+        <file crc="2292183326" name="modules/locale/org-netbeans-modules-cnd-kit_zh_CN.jar"/>
+        <file crc="2539145348" name="modules/org-netbeans-modules-cnd-kit.jar"/>
+    </module_version>
+</module>

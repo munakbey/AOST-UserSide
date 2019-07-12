@@ -1,0 +1,2581 @@
+//160201015-160201063
+//Nilüfer TOKDEMİR-Özge SOĞUKPINAR
+
+//User.java
+package com.example.nilufer.dataekleme;
+
+public class User {
+    private String name;
+    private String password;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public User(String name, String password){
+        this.name = name;
+        this.password = password;
+    }
+    public  User(){
+
+    }
+
+}
+//Users.java
+package com.example.nilufer.dataekleme;
+
+public class Users {
+    private String name;
+    private String Password;
+
+    public Users() {
+
+    }
+
+    public Users( String name, String password) {
+        this.name = name;
+        Password = password;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public String getPassword() {
+        return Password;
+    }
+
+    public void setPassword(String password) {
+        this.Password = password;
+    }
+
+}
+
+//Guvenlik.java
+package com.example.nilufer.dataekleme;
+
+import android.util.Base64;
+
+import java.security.Key;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+public class Guvenlik {
+    private static final String ALGORITHM = "AES";
+    private static final String KEY = "1Hbfh667adfDEJ78";
+
+    public static String encrypt(String value) throws Exception
+    {
+        Key key = generateKey();
+        Cipher cipher = Cipher.getInstance(Guvenlik.ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte [] encryptedByteValue = cipher.doFinal(value.getBytes("utf-8"));
+        String encryptedValue64 = Base64.encodeToString(encryptedByteValue, Base64.DEFAULT);
+        return encryptedValue64;
+
+    }
+
+    public static String decrypt(String value) throws Exception
+    {
+        Key key = generateKey();
+        Cipher cipher = Cipher.getInstance(Guvenlik.ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decryptedValue64 = Base64.decode(value, Base64.DEFAULT);
+        byte [] decryptedByteValue = cipher.doFinal(decryptedValue64);
+        String decryptedValue = new String(decryptedByteValue,"utf-8");
+        return decryptedValue;
+
+    }
+
+    private static Key generateKey() throws Exception
+    {
+        Key key = new SecretKeySpec(Guvenlik.KEY.getBytes(), Guvenlik.ALGORITHM);
+        return key;
+    }
+}
+
+//Kayit.java
+package com.example.nilufer.dataekleme;
+
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class Kayit extends AppCompatActivity {
+    EditText tName,tPassword,tConfirmPassword;
+    Button btnRegister,btnShow;
+    ListView ListUser;
+    DatabaseReference databaseReference;
+    private TextView result;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
+        result=(TextView)findViewById(R.id.textView2);
+        tName=(EditText) findViewById(R.id.tName);
+        tPassword=(EditText) findViewById(R.id.tPassword);
+        tConfirmPassword=(EditText) findViewById(R.id.tConfirmPassword);
+        btnRegister=(Button) findViewById(R.id.btnRegister);
+        btnShow=(Button) findViewById(R.id.btnShow);
+        databaseReference= FirebaseDatabase.getInstance().getReference("users");
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addArrayList();
+                Intent intphto =new Intent(getApplicationContext(),Showdata.class);
+                startActivity(intphto);
+
+            }
+        });
+        btnShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intphto =new Intent(getApplicationContext(),Showdata.class);
+                startActivity(intphto);
+
+            }
+        });
+    }
+    private void  addArrayList(){
+        String name =tName.getText().toString().trim();
+        String password =tPassword.getText().toString().trim();
+        String comfirmpassword =tConfirmPassword.getText().toString().trim();
+        String resulthash = result.getText().toString().trim();
+
+         if (TextUtils.isEmpty(name)){
+            tName.setError("Please enter your Name!");
+        }else if(TextUtils.isEmpty(password)){
+            tPassword.setError("Please enter your Password!");
+        }else if(!password.equals(comfirmpassword)){
+            tConfirmPassword.setError("Please put the same password");
+        }else{
+
+            Users students= new Users(name,password);
+            databaseReference.child(name).child("name").setValue(name.toString());
+            try {
+                databaseReference.child(name).child("password").setValue(Guvenlik.encrypt(password));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(this,"User is added",Toast.LENGTH_LONG).show();
+            Cleartxt();
+
+        }
+
+    }
+    private void Cleartxt(){
+        tName.setText("");
+        tPassword.setText("");
+        tConfirmPassword.setText("");
+        result.setText("");
+
+    }
+    public void computeMD5Hash(String password) {
+
+        try {
+            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            digest.update(password.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            StringBuffer MD5Hash = new StringBuffer();
+            for (int i = 0; i < messageDigest.length; i++) {
+                String h = Integer.toHexString(0xFF & messageDigest[i]);
+                while (h.length() < 2)
+                    h = "0" + h;
+                MD5Hash.append(h);
+            }
+
+            result.setText(MD5Hash);
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+}
+//SifreIslemleri.java
+package com.example.nilufer.dataekleme;
+
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+public class SifreIslemleri extends AppCompatActivity {
+    EditText tID,tName,tEmail,tPassword,tConfirmPassword;
+    Button btnUpdate,btnCancel;
+    DatabaseReference databaseReference;
+    private TextView result;
+    Modul module;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_update);
+        result=(TextView)findViewById(R.id.textView2);
+        tName=(EditText) findViewById(R.id.tName);
+        tPassword=(EditText) findViewById(R.id.tPassword);
+        tConfirmPassword=(EditText) findViewById(R.id.tConfirmPassword);
+        btnUpdate=(Button) findViewById(R.id.btnUpadate);
+        btnCancel= (Button) findViewById(R.id.btnCancel) ;
+        databaseReference= FirebaseDatabase.getInstance().getReference("users");
+        module=((Modul)getApplicationContext());
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Users students = dataSnapshot.child(String.valueOf(tName.getText())).getValue(Users.class);
+                tName.setText(students.getName());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateArrayList();
+                Cleartxt();
+                Intent intphto =new Intent(getApplicationContext(),Login.class);
+                startActivity(intphto);
+
+
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Cleartxt();
+            }
+        });
+    }
+    private void Cleartxt(){
+        tName.setText("");
+        tPassword.setText("");
+        tConfirmPassword.setText("");
+        result.setText("");
+
+    }
+
+    private void  updateArrayList() {
+        final String name = tName.getText().toString().trim();
+        final String password = tPassword.getText().toString().trim();
+        String comfirmpassword = tConfirmPassword.getText().toString().trim();
+        String resulthash = result.getText().toString().trim();
+         if (TextUtils.isEmpty(name)) {
+            tName.setError("Lütfen İsminizi Girin!");
+        } else if (TextUtils.isEmpty(password)) {
+            tPassword.setError("Lütfen Şifrenizi Girin!");
+        } else if (!password.equals(comfirmpassword)) {
+            tConfirmPassword.setError("Lütfen aynı şifreyi girin!!!");
+        } else {
+
+            Users students = new Users(name, password);
+            databaseReference.child("users").child(name).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    databaseReference = FirebaseDatabase.getInstance().getReference();
+                    databaseReference.child("users").child(name).child("name").setValue(name);
+                    try {
+                        databaseReference.child("users").child(name).child("password").setValue(Guvenlik.encrypt(password));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            Toast.makeText(this, "Şifre Değiştirildi", Toast.LENGTH_LONG).show();
+            Cleartxt();
+
+        }
+    }
+}
+//Showdata.java
+
+package com.example.nilufer.dataekleme;
+
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+
+public class Showdata extends AppCompatActivity {
+    DatabaseReference databaseReference;
+    ListView listshow;
+    Button btnUpdate,btnDelete;
+    ArrayList <String> arrList= new ArrayList<>();
+    ArrayAdapter <String> arrAdp;
+    Modul module;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_showdata);
+        module=((Modul)getApplicationContext());
+        databaseReference=FirebaseDatabase.getInstance().getReference("users");
+        listshow= (ListView) findViewById(R.id.listviewtxt);
+        btnUpdate=(Button) findViewById(R.id.btnUpdate);
+        btnDelete=(Button) findViewById(R.id.btnDelete);
+        arrAdp= new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,arrList);
+        listshow.setAdapter(arrAdp);
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String value= dataSnapshot.getValue(Users.class).toString();
+                arrList.add(value);
+                arrAdp.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        listshow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                module.setGvalue_id(arrList.get(position));
+                module.setGvalue_Name(arrList.get(position));
+            }
+        });
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(module.getGvalue_id().equals("")){
+                    Toast.makeText(Showdata.this,"Lütfen Firmaları Seçin",Toast.LENGTH_LONG).show();
+                }else {
+                    Intent intphto =new Intent(getApplicationContext(),SifreIslemleri.class);
+                    startActivity(intphto);
+                }
+            }
+        });
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String str = module.getGvalue_id().substring(0,6);
+                if(str==""){
+                    Toast.makeText(Showdata.this,"Lütfen Firmaları Seçin",Toast.LENGTH_LONG).show();
+                }else {
+
+                    databaseReference.child("users").child(str).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            //databaseReference = FirebaseDatabase.getInstance().getReference("Students");
+                            databaseReference.child(str).removeValue();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                    Toast.makeText(Showdata.this,"Kullanıcı Silindi",Toast.LENGTH_LONG).show();
+                    Intent intphto =new Intent(getApplicationContext(),Showdata.class);
+                    startActivity(intphto);
+                }
+            }
+        });
+
+    }
+}
+
+//Modul.java
+package com.example.nilufer.dataekleme;
+
+import android.app.Application;
+import android.widget.ArrayAdapter;
+
+import java.util.ArrayList;
+
+public class Modul extends Application {
+    public ArrayList <String> garrList= new ArrayList<>();
+    public ArrayAdapter<String> garrAdp;
+    public String gvalue_id;
+    public String gvalue_Name;
+
+    public String getGvalue_id() {
+        return gvalue_id;
+    }
+
+    public void setGvalue_id(String gvalue_id) {
+        this.gvalue_id = gvalue_id;
+    }
+
+    public String getGvalue_Name() {
+        return gvalue_Name;
+    }
+
+    public void setGvalue_Name(String gvalue_Name) {
+        this.gvalue_Name = gvalue_Name;
+    }
+}
+//Delete.java
+package com.example.nilufer.dataekleme;
+
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+public class Delete extends AppCompatActivity {
+    EditText tID;
+    Button btnDelete;
+    DatabaseReference databaseReference;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_delete);
+        tID=(EditText) findViewById(R.id.tID);
+        btnDelete=(Button) findViewById(R.id.btnDelete);
+        databaseReference= FirebaseDatabase.getInstance().getReference("advertisement");
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String advertisement_id = tID.getText().toString().trim();
+                //databaseReference.child("advertisement").child(advertisement_id);
+                //databaseReference.setValue(null);
+                databaseReference.child("advertisement").child(advertisement_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        //databaseReference = FirebaseDatabase.getInstance().getReference("advertisement");
+                        databaseReference.child(advertisement_id).removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+                Toast.makeText(Delete.this,"Advertisement is deleted",Toast.LENGTH_LONG).show();
+                tID.setText("");
+                Intent intphto =new Intent(getApplicationContext(),Showdata.class);
+                startActivity(intphto);
+            }
+        });
+
+    }
+}
+//Constants.java
+package com.example.nilufer.dataekleme;
+
+public final class Constants {
+
+    public static final int SUCCESS_RESULT = 0;
+    public static final int FAILURE_RESULT = 1;
+
+    public static final int USE_ADDRESS_NAME = 1;
+    public static final int USE_ADDRESS_LOCATION = 2;
+
+    public static final String PACKAGE_NAME =
+            "com.example.nilufer.dataekleme";
+    public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
+    public static final String RESULT_DATA_KEY = PACKAGE_NAME + ".RESULT_DATA_KEY";
+    public static final String RESULT_ADDRESS = PACKAGE_NAME + ".RESULT_ADDRESS";
+    public static final String LOCATION_LATITUDE_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_LATITUDE_DATA_EXTRA";
+    public static final String LOCATION_LONGITUDE_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_LONGITUDE_DATA_EXTRA";
+    public static final String LOCATION_NAME_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_NAME_DATA_EXTRA";
+    public static final String FETCH_TYPE_EXTRA = PACKAGE_NAME + ".FETCH_TYPE_EXTRA";
+}
+//NotificationService.java
+package com.example.nilufer.dataekleme.Bildirim;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
+
+
+import com.example.nilufer.dataekleme.Constants;
+import com.example.nilufer.dataekleme.R;
+import com.example.nilufer.dataekleme.fGosterim;
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class NotificationService extends Service {
+
+    Context context ;
+    Notification notification;
+    Timer timer;
+    final private String url = "https://us-central1-api1-13f97.cloudfunctions.net/getItems";
+
+    static ArrayList<Integer> myList = new ArrayList<Integer>();
+    public static List myList2 = new ArrayList<>();
+    static Double lat = null ,alng = null,threshold = null;
+    static String flt = null;
+
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        super.onStart(intent, startId);
+        lat = intent.getDoubleExtra("lat",0);
+        alng = intent.getDoubleExtra("long",0);
+        threshold = intent.getDoubleExtra("threshold",0);
+        flt = intent.getStringExtra("kategori");
+        System.out.println("lat :"+lat+"long"+alng+"threshold : "+threshold);
+
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+
+
+        return null;
+    }
+    @Override
+    public void onCreate() {
+        context = getApplicationContext();
+        Toast.makeText(this, "Servis Çalıştı.Bu Mesaj Servis Class'dan", Toast.LENGTH_LONG).show();
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {  
+            @Override
+            public void run() {
+                new arkaplan().execute(url);
+            }
+
+        }, 0, 60000);
+
+    }
+
+    class arkaplan extends AsyncTask<String,String,String> {
+        protected String doInBackground(String... params) {
+            HttpURLConnection connection = null;
+            BufferedReader br = null;
+            BufferedReader brr = null;
+
+            try {
+                URL url = new URL(params[0]);
+
+
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                InputStream is = connection.getInputStream();
+                br = new BufferedReader(new InputStreamReader(is));
+                String satir;
+                String dosya = "";
+                while ((satir = br.readLine()) != null) {
+                    Log.d("satir:", satir);
+                    dosya += satir;
+                }
+                //myList.add(Integer.valueOf(dosya));
+                System.out.println("arraylistim");
+                for (int i=0;i<myList.size();i++)
+                {
+                    System.out.println("kacinci:"+i+"  .. "+myList.get(i));
+
+                }
+
+                String dosyaa = "";
+
+
+
+                String myurl = "https://us-central1-api1-13f97.cloudfunctions.net/getItems";
+                URL newurl = new URL(myurl);
+                connection = (HttpURLConnection) newurl.openConnection();
+                connection.connect();
+                InputStream iss = connection.getInputStream();
+                brr = new BufferedReader(new InputStreamReader(iss));
+                String satirr;
+
+                while ((satirr = brr.readLine()) != null) {
+                    Log.d("satirr:", satirr);
+                    dosyaa += satirr;
+                }
+                System.out.println("....EKLENEN HABER DETAYİ...");
+
+                System.out.println(dosyaa);
+                int ArraySayisi = 0;
+                JSONArray array = new JSONArray(dosyaa);
+                for (int i=0;i<array.length();i++)
+                {
+                    JSONObject object = array.getJSONObject(i);
+                    System.out.println("flt : " + flt);
+                    if (flt != null && flt.equalsIgnoreCase(object.getString("kampanyaIcerigi"))) {
+                        LatLng uzun = gps(object.getString("firmaLokasyon"));
+                        Double lt = uzun.latitude;
+                        Double lng1 = uzun.longitude;
+                        double ms = addressCalculation(lat, alng, lt, lng1);
+                        System.out.println("bildirim :uzunluk(ms) :" + ms + "threshold :" + threshold+"kategori :"+flt);
+                        if (ms <= threshold) {
+                            myList2.add(String.valueOf(object.getInt("firmaId")));
+                            myList2.add(object.getString("firmaAdi"));
+                            myList2.add(object.getString("firmaLokasyon"));
+                            myList2.add(object.getString("kampanyaIcerigi"));
+                            myList2.add(object.getString("kampanyaSuresi"));
+                            ArraySayisi++;
+
+                        }
+
+                    }else if(flt == null || flt.isEmpty()){
+
+                        LatLng uzun = gps(object.getString("firmaLokasyon"));
+                        Double lt = uzun.latitude;
+                        Double lng1 = uzun.longitude;
+                        double ms = addressCalculation(lat, alng, lt, lng1);
+                        System.out.println("bildirim :uzunluk(ms) :" + ms + "threshold :" + threshold+"kategori :"+flt);
+                        if (ms <= threshold) {
+                            myList2.add(String.valueOf(object.getInt("firmaId")));
+                            myList2.add(object.getString("firmaAdi"));
+                            myList2.add(object.getString("firmaLokasyon"));
+                            myList2.add(object.getString("kampanyaIcerigi"));
+                            myList2.add(object.getString("kampanyaSuresi"));
+                            ArraySayisi++;
+
+
+                        }
+                    }
+
+
+                }
+
+                notificationcall(myList2,ArraySayisi);
+                return dosya;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return "hata";
+        }
+
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d("posttan gelen",s);
+
+        }
+
+        public void notificationcall(List myList2,int sayi)
+        {
+            int count=0;
+            System.out.println("sayi :"+sayi);
+
+            for (int i=0;i<sayi;i++)
+            {
+
+                Intent intent = new Intent(getApplicationContext(), fGosterim.class);
+                intent.putExtra("lat",lat);
+                intent.putExtra("long",alng);
+                intent.putExtra("threshold",threshold);
+                intent.putExtra("kategori",flt);
+
+
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                count++;
+
+                PendingIntent resultpendingIntent = PendingIntent.getActivity(getApplicationContext(), (i+1), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext())
+                        .setDefaults(NotificationCompat.DEFAULT_ALL)
+                        .setSmallIcon(R.drawable.ic_launcher_background)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background))
+                        .setContentTitle("kampanya :"+(i+1))
+                        .setContentText("FirmaId :"+myList2.get(i*5)+"Firma ADI:"+myList2.get(i*5+1)+"Firma Lokasyon :"+myList2.get(i*5+2)+"Kampanya Iceriği :"+myList2.get(i*5+3)+"Kampanya Suresi :"+myList2.get(i*5+4))
+                        .setAutoCancel(true)
+                        .setContentIntent(resultpendingIntent);
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify((i+1), notificationBuilder.build());
+            }
+
+
+
+        }
+    }
+    public LatLng gps( String strAddress) {
+
+        Geocoder coder = new Geocoder(this);
+        List<Address> address;
+        LatLng p1 = null;
+
+        try {
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) {
+                return null;
+            }
+
+            Address location = address.get(0);
+            p1 = new LatLng(location.getLatitude(), location.getLongitude() );
+
+        } catch (IOException ex) {
+
+            ex.printStackTrace();
+        }
+
+
+        return p1;
+    }
+    private double addressCalculation(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+
+        dist = dist * 1.609344;
+
+        return (dist);
+    }
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+
+    @Override
+    public void onDestroy() {
+        timer.cancel();
+        Toast.makeText(this, "Servis Durduruldu.Bu Mesaj Servis Class'dan", Toast.LENGTH_LONG).show();
+    }
+
+}
+//Firmalar.java
+package com.example.nilufer.dataekleme.Gosterim;
+
+public class Firmalar {
+    private String firmaid;
+    private String firmaAdi;
+    private String firmaLokasyon;
+    private String kampanyaIcerik;
+    private int kampanyaSuresi;
+
+    public Firmalar(String firmaid, String firmaAdi, String firmaLokasyon, String kampanyaIcerik, int kampanyaSuresi) {
+        this.firmaid = firmaid;
+        this.firmaAdi = firmaAdi;
+        this.firmaLokasyon = firmaLokasyon;
+        this.kampanyaIcerik = kampanyaIcerik;
+        this.kampanyaSuresi = kampanyaSuresi;
+    }
+
+    public String getFirmaid() {
+        return firmaid;
+    }
+
+    public void setFirmaid(String firmaid) {
+        this.firmaid = firmaid;
+    }
+
+    public String getFirmaAdi() {
+        return firmaAdi;
+    }
+
+    public void setFirmaAdi(String firmaAdi) {
+        this.firmaAdi = firmaAdi;
+    }
+
+    public String getFirmaLokasyon() {
+        return firmaLokasyon;
+    }
+
+    public void setFirmaLokasyon(String firmaLokasyon) {
+        this.firmaLokasyon = firmaLokasyon;
+    }
+
+    public String getKampanyaIcerik() {
+        return kampanyaIcerik;
+    }
+
+    public void setKampanyaIcerik(String kampanyaIcerik) {
+        this.kampanyaIcerik = kampanyaIcerik;
+    }
+
+    public int getKampanyaSuresi() {
+        return kampanyaSuresi;
+    }
+
+    public void setKampanyaSuresi(int kampanyaSuresi) {
+        this.kampanyaSuresi = kampanyaSuresi;
+    }
+}
+//fGosterim.java
+package com.example.nilufer.dataekleme;
+
+import android.content.Context;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.widget.TextView;
+
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.nilufer.dataekleme.Bildirim.NotificationService;
+import com.example.nilufer.dataekleme.Gosterim.FirmaAdapter;
+import com.example.nilufer.dataekleme.Gosterim.Firmalar;
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+public class fGosterim extends AppCompatActivity {
+
+    private static final String TAG = "fGosterim";
+
+    private RecyclerView mList;
+    private TextView kategori;
+    String flt;
+    private ArrayList adres;
+    private LinearLayoutManager linearLayoutManager;
+    private DividerItemDecoration dividerItemDecoration;
+    private List<Firmalar> firmalarList;
+    private List<Double> uzunluklar ;
+    private RecyclerView.Adapter adapter;
+    private String url = "https://us-central1-api1-13f97.cloudfunctions.net/getItems";
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_fgosterim);
+
+        mList = findViewById(R.id.recyclerView);
+
+        firmalarList = new ArrayList<>();
+        mList.setAdapter(adapter);
+
+        adapter = new FirmaAdapter(getApplicationContext(),firmalarList);
+
+
+        mList.setAdapter(adapter);
+        adapter = new FirmaAdapter(getApplicationContext(),firmalarList);
+
+        if (getIntent().hasExtra("kategori" )){
+            flt =getIntent().getStringExtra("kategori");
+
+        }
+
+        linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        dividerItemDecoration = new DividerItemDecoration(mList.getContext(), linearLayoutManager.getOrientation());
+
+        mList.setHasFixedSize(true);
+        mList.setLayoutManager(linearLayoutManager);
+        mList.addItemDecoration(dividerItemDecoration);
+        mList.setAdapter(adapter);
+
+        getDoubleExtras();
+
+
+    }
+    private void getData(final Double lat, final Double aLong, final Double threshold) {
+
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new com.android.volley.Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String response) {
+
+                        try {
+                            List<Firmalar> firma =new ArrayList<Firmalar>();
+                            adres =new ArrayList();
+                            LatLng uzun = null;
+                          JSONArray array=new JSONArray(response);
+                            for (int i=0;i<array.length();i++)
+                            {
+
+
+                                JSONObject object=array.getJSONObject(i);
+                                Firmalar firmalar=new Firmalar(object.getString("firmaId"),object.getString("firmaAdi"),
+                                        object.getString("firmaLokasyon"),object.getString("kampanyaIcerigi"),object.getInt("kampanyaSuresi")
+                                );
+
+
+                                System.out.println("flt : "+flt);
+                                if(flt != null && flt.equalsIgnoreCase(object.getString("kampanyaIcerigi"))){
+                                    uzun =gps( object.getString("firmaLokasyon"));
+                                    Double lt = uzun.latitude;
+                                    Double lng = uzun.longitude;
+                                    double ms =addressCalculation(lat,aLong,lt,lng);
+                                    System.out.println("uzunluk(ms) :"+ms+"threshold :"+threshold);
+                                    if (ms <= threshold){
+                                        firmalarList.add(firmalar);
+                                        firma.add(firmalar);
+                                    }
+
+
+                                }else if(flt == null || flt.isEmpty()){
+                                    uzun =gps( object.getString("firmaLokasyon"));
+                                    Double lt = uzun.latitude;
+                                    Double lng = uzun.longitude;
+                                    double ms =addressCalculation(lat,aLong,lt,lng);
+                                    System.out.println("uzunluk(ms) :"+ms);
+                                    if (ms <= threshold){
+                                        firmalarList.add(firmalar);
+                                        firma.add(firmalar);
+
+                                    }
+
+                                }
+
+                                adapter.notifyDataSetChanged();
+
+                            }
+                            Intent intent = new Intent(getApplicationContext(), NotificationService.class);
+                            intent.putExtra("lat", lat);
+                            intent.putExtra("long", aLong);
+                            intent.putExtra("threshold", threshold);
+                            intent.putExtra("kategori", flt);
+                            startService(intent);
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+
+    }
+
+    public LatLng gps( String strAddress) {
+
+        Geocoder coder = new Geocoder(this);
+        List<Address> address;
+        LatLng k = null;
+
+        try {
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) {
+                return null;
+            }
+
+            Address location = address.get(0);
+            k = new LatLng(location.getLatitude(), location.getLongitude() );
+
+        } catch (IOException ex) {
+
+            ex.printStackTrace();
+        }
+
+
+        return k;
+    }
+
+    private void getDoubleExtras()
+    {
+        Double lat=getIntent().getDoubleExtra("lat",0);
+        Double aLong=getIntent().getDoubleExtra("long",0);
+        Double threshold=getIntent().getDoubleExtra("threshold",0);
+        System.out.println("lat :"+lat+"long"+aLong+"threshold : "+threshold);
+        getData(lat,aLong,threshold);
+
+    }
+    private double addressCalculation(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+
+        dist = dist * 1.609344;
+
+        return (dist);
+    }
+
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
+
+
+
+}
+//FirmaAdapter.java
+package com.example.nilufer.dataekleme.Gosterim;
+
+import android.content.Context;
+import android.graphics.Movie;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.example.nilufer.dataekleme.R;
+
+import java.util.List;
+
+
+public class FirmaAdapter extends RecyclerView.Adapter<FirmaAdapter.ViewHolder> {
+
+    private Context context;
+    private List<Firmalar> list;
+
+    public FirmaAdapter(Context context, List<Firmalar> list) {
+        this.context = context;
+        this.list = list;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context).inflate(R.layout.activity_single_item, parent, false);
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        Firmalar firmalar = list.get(position);
+
+        holder.firmaId.setText(firmalar.getFirmaid());
+        holder.firmaAdi.setText(String.valueOf(firmalar.getFirmaAdi()));
+        holder.firmaLokasyon.setText(String.valueOf(firmalar.getFirmaLokasyon()));
+        holder.kampanyaIcerik.setText(String.valueOf(firmalar.getKampanyaIcerik()));
+        holder.kampanyaSuresi.setText(String.valueOf(firmalar.getKampanyaSuresi()));
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return list.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView firmaId, firmaAdi, firmaLokasyon,kampanyaSuresi,kampanyaIcerik;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            firmaId = itemView.findViewById(R.id.firmaID);
+            firmaAdi = itemView.findViewById(R.id.firmaAdi);
+            firmaLokasyon = itemView.findViewById(R.id.firmaLokasyon);
+            kampanyaIcerik = itemView.findViewById(R.id.kampanyaİcerigi);
+            kampanyaSuresi = itemView.findViewById(R.id.kampanyaSuresi);
+
+        }
+    }
+
+}
+
+//GeocodeAddressIntentService.java
+package com.example.nilufer.dataekleme;
+
+import android.app.IntentService;
+import android.app.Service;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Bundle;
+import android.os.ResultReceiver;
+import android.text.TextUtils;
+import android.util.Log;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+public class GeocodeAddressIntentService extends IntentService {
+
+    protected ResultReceiver resultReceiver;
+    private static final String TAG = "GEO_ADDY_SERVICE";
+
+    public GeocodeAddressIntentService() {
+        super("GeocodeAddressIntentService");
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        Log.e(TAG, "onHandleIntent");
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        String errorMessage = "";
+        List<Address> addresses = null;
+
+        int fetchType = intent.getIntExtra(Constants.FETCH_TYPE_EXTRA, 0);
+        Log.e(TAG, "fetchType == " + fetchType);
+
+        if(fetchType == Constants.USE_ADDRESS_NAME) {
+            String name = intent.getStringExtra(Constants.LOCATION_NAME_DATA_EXTRA);
+            try {
+                addresses = geocoder.getFromLocationName(name, 1);
+            } catch (IOException e) {
+                errorMessage = "Service not available";
+                Log.e(TAG, errorMessage, e);
+            }
+        }
+        else if(fetchType == Constants.USE_ADDRESS_LOCATION) {
+            double latitude = intent.getDoubleExtra(Constants.LOCATION_LATITUDE_DATA_EXTRA, 0);
+            double longitude = intent.getDoubleExtra(Constants.LOCATION_LONGITUDE_DATA_EXTRA, 0);
+
+            try {
+                addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            } catch (IOException ioException) {
+                errorMessage = "Servis Kullanım Dışı";
+                Log.e(TAG, errorMessage, ioException);
+            } catch (IllegalArgumentException illegalArgumentException) {
+                errorMessage = "Invalid Latitude or Longitude Used";
+                Log.e(TAG, errorMessage + ". " +
+                        "Latitude = " + latitude + ", Longitude = " +
+                        longitude, illegalArgumentException);
+            }
+        }
+        else {
+            errorMessage = "Unknown Type";
+            Log.e(TAG, errorMessage);
+        }
+
+        resultReceiver = intent.getParcelableExtra(Constants.RECEIVER);
+        if (addresses == null || addresses.size()  == 0) {
+            if (errorMessage.isEmpty()) {
+                errorMessage = "Bulunamadı";
+                Log.e(TAG, errorMessage);
+            }
+            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage, null);
+        } else {
+            for(Address address : addresses) {
+                String outputAddress = "";
+                for(int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                    outputAddress += " --- " + address.getAddressLine(i);
+                }
+                Log.e(TAG, outputAddress);
+            }
+            Address address = addresses.get(0);
+            ArrayList<String> addressFragments = new ArrayList<>();
+
+            for(int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                addressFragments.add(address.getAddressLine(i));
+            }
+            Log.i(TAG, "Adres bulundu");
+            deliverResultToReceiver(Constants.SUCCESS_RESULT,
+                    TextUtils.join(System.getProperty("line.separator"),
+                            addressFragments), address);
+        }
+    }
+
+    private void deliverResultToReceiver(int resultCode, String message, Address address) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Constants.RESULT_ADDRESS, address);
+        bundle.putString(Constants.RESULT_DATA_KEY, message);
+        resultReceiver.send(resultCode, bundle);
+    }
+}
+//MainActivityWithAsyncTask.java
+
+package com.example.nilufer.dataekleme;
+
+import android.support.v7.app.AppCompatActivity;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.TextView;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+public class MainActivityWithAsyncTask extends AppCompatActivity {
+
+    EditText latitudeEdit, longitudeEdit, addressEdit;
+    TextView infoText;
+    CheckBox checkBox;
+
+    public static final int USE_ADDRESS_NAME = 1;
+    public static final int USE_ADDRESS_LOCATION = 2;
+
+    int fetchType = USE_ADDRESS_LOCATION;
+
+    private static final String TAG = "MAIN_ACTIVITY_ASYNC";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sayfa);
+
+        longitudeEdit = (EditText) findViewById(R.id.longitudeEdit);
+        latitudeEdit = (EditText) findViewById(R.id.latitudeEdit);
+        addressEdit = (EditText) findViewById(R.id.adress);
+        infoText = (TextView) findViewById(R.id.infoText);
+        checkBox = (CheckBox) findViewById(R.id.checkbox);
+    }
+
+    public void onRadioButtonClicked(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+
+        switch(view.getId()) {
+            case R.id.radioAddress:
+                if (checked) {
+                    fetchType = USE_ADDRESS_NAME;
+                    longitudeEdit.setEnabled(false);
+                    latitudeEdit.setEnabled(false);
+                    addressEdit.setEnabled(true);
+                    addressEdit.requestFocus();
+                }
+                break;
+            case R.id.radioLocation:
+                if (checked) {
+                    fetchType = USE_ADDRESS_LOCATION;
+                    latitudeEdit.setEnabled(true);
+                    latitudeEdit.requestFocus();
+                    longitudeEdit.setEnabled(true);
+                    addressEdit.setEnabled(false);
+                }
+                break;
+        }
+    }
+
+    public void onButtonClicked(View view) {
+        new GeocodeAsyncTask().execute();
+    }
+
+    class GeocodeAsyncTask extends AsyncTask<Void, Void, Address> {
+
+        String errorMessage = "";
+
+        @Override
+        protected void onPreExecute() {
+            infoText.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
+        protected Address doInBackground(Void ... none) {
+            Geocoder geocoder = new Geocoder(MainActivityWithAsyncTask.this, Locale.getDefault());
+            List<Address> addresses = null;
+
+            if(fetchType == USE_ADDRESS_NAME) {
+                String name = addressEdit.getText().toString();
+                try {
+                    addresses = geocoder.getFromLocationName(name, 1);
+                } catch (IOException e) {
+                    errorMessage = "Service not available";
+                    Log.e(TAG, errorMessage, e);
+                }
+            }
+            else if(fetchType == USE_ADDRESS_LOCATION) {
+                double latitude = Double.parseDouble(latitudeEdit.getText().toString());
+                double longitude = Double.parseDouble(longitudeEdit.getText().toString());
+
+                try {
+                    addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                } catch (IOException ioException) {
+                    errorMessage = "Service Not Available";
+                    Log.e(TAG, errorMessage, ioException);
+                } catch (IllegalArgumentException illegalArgumentException) {
+                    errorMessage = "Invalid Latitude or Longitude Used";
+                    Log.e(TAG, errorMessage + ". " +
+                            "Latitude = " + latitude + ", Longitude = " +
+                            longitude, illegalArgumentException);
+                }
+            }
+            else {
+                errorMessage = "Unknown Type";
+                Log.e(TAG, errorMessage);
+            }
+
+            if(addresses != null && addresses.size() > 0)
+                return addresses.get(0);
+
+            return null;
+        }
+
+        protected void onPostExecute(Address address) {
+            if(address == null) {
+                infoText.setVisibility(View.VISIBLE);
+                infoText.setText(errorMessage);
+            }
+            else {
+                String addressName = "";
+                for(int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                    addressName += " --- " + address.getAddressLine(i);
+                }
+                infoText.setVisibility(View.VISIBLE);
+                infoText.setText("Latitude: " + address.getLatitude() + "\n" +
+                        "Longitude: " + address.getLongitude() + "\n" +
+                        "Address: " + addressName);
+            }
+        }
+    }
+}
+
+
+//GirisSayfası.java
+package com.example.nilufer.dataekleme;
+
+import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
+import android.location.Address;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.nilufer.dataekleme.Bildirim.NotificationService;
+
+public class GirisSayfası extends AppCompatActivity {
+
+    private static final int REQUEST_LOCATION = 1;
+    LocationManager locationManager;
+
+    AddressResultReceiver mResultReceiver;
+    EditText threshold, kategori;
+    String aralık;
+    String filtre;
+
+    EditText latitudeEdit, longitudeEdit, addressEdit;
+    TextView infoText;
+    CheckBox checkBox;
+    Button fetch;
+    RadioGroup rdB;
+
+    boolean fetchAddress;
+    int fetchType = Constants.USE_ADDRESS_LOCATION;
+    boolean gps = false;
+
+    private static final String TAG = "GirisSayfası";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sayfa);
+
+        threshold = (EditText) findViewById(R.id.threshold);
+        kategori = (EditText) findViewById(R.id.kategori);
+
+        longitudeEdit = (EditText) findViewById(R.id.longitudeEdit);
+        latitudeEdit = (EditText) findViewById(R.id.latitudeEdit);
+        addressEdit = (EditText) findViewById(R.id.adress);
+        infoText = (TextView) findViewById(R.id.infoText);
+        checkBox = (CheckBox) findViewById(R.id.checkbox);
+        fetch = (Button) findViewById(R.id.search);
+        rdB = (RadioGroup) findViewById(R.id.radioGroup);
+
+        fetch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onButtonClicked(view);
+            }
+        });
+        rdB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onRadioButtonClicked(view);
+            }
+        });
+        mResultReceiver = new AddressResultReceiver(null);
+
+    }
+
+
+
+    public void onRadioButtonClicked(View view) {
+        boolean checked = ((RadioButton) view).isChecked();
+
+        switch(view.getId()) {
+            case R.id.radioAddress:
+                if (checked) {
+                    fetchAddress = false;
+                    fetchType = Constants.USE_ADDRESS_NAME;
+                    longitudeEdit.setEnabled(false);
+                    latitudeEdit.setEnabled(false);
+                    addressEdit.setEnabled(true);
+                    addressEdit.requestFocus();
+                }
+                break;
+            case R.id.radioLocation:
+                if (checked) {
+                    fetchAddress = true;
+                    fetchType = Constants.USE_ADDRESS_LOCATION;
+                    latitudeEdit.setEnabled(true);
+                    latitudeEdit.requestFocus();
+                    longitudeEdit.setEnabled(true);
+                    addressEdit.setEnabled(false);
+                }
+                break;
+            case R.id.gpsRadio:
+                if (checked) {
+                    gps = true;
+                }
+                break;
+        }
+    }
+
+    private void getLocation() {
+
+        String lattitude,longitude;
+
+
+        if (ActivityCompat.checkSelfPermission(GirisSayfası.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
+                (GirisSayfası.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(GirisSayfası.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+
+        } else {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            Location location1 = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            Location location2 = locationManager.getLastKnownLocation(LocationManager. PASSIVE_PROVIDER);
+
+            if (location != null) {
+                double latti = location.getLatitude();
+                double longi = location.getLongitude();
+                lattitude = String.valueOf(latti);
+                longitude = String.valueOf(longi);
+
+                aralık = threshold.getText().toString().trim();
+                System.out.println("aralık :"+aralık);
+                filtre = kategori.getText().toString().trim();
+
+                Intent intphto = new Intent(getApplicationContext(), fGosterim.class);
+                System.out.println("GPS---Giris lat :"+lattitude);
+                intphto.putExtra("kategori",filtre);
+                intphto.putExtra("lat",latti);
+                intphto.putExtra("long",longi);
+                intphto.putExtra("threshold",aralık);
+
+                startActivity(intphto);
+
+
+            } else  if (location1 != null) {
+                double latti = location1.getLatitude();
+                double longi = location1.getLongitude();
+                lattitude = String.valueOf(latti);
+                longitude = String.valueOf(longi);
+
+                aralık = threshold.getText().toString().trim();
+                System.out.println("aralık :"+aralık);
+                filtre = kategori.getText().toString().trim();
+
+
+                Intent intphto = new Intent(getApplicationContext(), fGosterim.class);
+                System.out.println("GPS---Giris lat :"+lattitude);
+                intphto.putExtra("kategori",filtre);
+                intphto.putExtra("lat",latti);
+                intphto.putExtra("long",longi);
+                intphto.putExtra("threshold",aralık);
+
+                startActivity(intphto);
+
+
+            } else  if (location2 != null) {
+                double latti = location2.getLatitude();
+                double longi = location2.getLongitude();
+                lattitude = String.valueOf(latti);
+                longitude = String.valueOf(longi);
+
+                aralık = threshold.getText().toString().trim();
+                System.out.println("aralık :"+aralık);
+                filtre = kategori.getText().toString().trim();
+                System.out.println("lat :"+latti+"long"+longi+"threshold : "+aralık);
+
+                Intent intphto = new Intent(getApplicationContext(), fGosterim.class);
+                System.out.println("GPS---Giris lat :"+lattitude);
+                System.out.println("threshold giris :" + Integer.valueOf(aralık));
+                intphto.putExtra("kategori",filtre);
+                intphto.putExtra("lat",latti);
+                intphto.putExtra("long",longi);
+                intphto.putExtra("threshold",aralık);
+
+                startActivity(intphto);
+
+            }else{
+
+                Toast.makeText(GirisSayfası.this,"Unble to Trace your location",Toast.LENGTH_SHORT).show();
+                gps = false;
+
+            }
+        }
+    }
+
+
+    public void onButtonClicked(View view) {
+        Intent intent = new Intent(this, GeocodeAddressIntentService.class);
+        intent.putExtra(Constants.RECEIVER, mResultReceiver);
+        intent.putExtra(Constants.FETCH_TYPE_EXTRA, fetchType);
+
+        if (threshold.getText().length() == 0) {
+
+            Toast.makeText(this,
+                    "Konum aralığı giriniz!",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (gps == true)
+        {
+            getLocation();
+        }else{
+        if(fetchType == Constants.USE_ADDRESS_NAME) {
+            if(addressEdit.getText().length() == 0) {
+                Toast.makeText(this, "Please enter an address name", Toast.LENGTH_LONG).show();
+                return;
+            }
+            intent.putExtra(Constants.LOCATION_NAME_DATA_EXTRA, addressEdit.getText().toString());
+
+
+        }
+        else {
+            if(latitudeEdit.getText().length() == 0 || longitudeEdit.getText().length() == 0) {
+                Toast.makeText(this,
+                        "Lat ve Long değerlerini girin",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            intent.putExtra(Constants.LOCATION_LATITUDE_DATA_EXTRA,
+                    Double.parseDouble(latitudeEdit.getText().toString()));
+            intent.putExtra(Constants.LOCATION_LONGITUDE_DATA_EXTRA,
+                    Double.parseDouble(longitudeEdit.getText().toString()));
+            intent.putExtra(Constants.LOCATION_LONGITUDE_DATA_EXTRA,
+                    Double.parseDouble(longitudeEdit.getText().toString()));
+
+        }
+        infoText.setVisibility(View.INVISIBLE);
+        Log.e(TAG, "Servis başlatılıyor");
+        startService(intent);
+
+        }
+
+    }
+
+
+    class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, final Bundle resultData) {
+            if (resultCode == Constants.SUCCESS_RESULT) {
+                final Address address = resultData.getParcelable(Constants.RESULT_ADDRESS);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        infoText.setVisibility(View.VISIBLE);
+                        infoText.setText("Latitude: " + address.getLatitude() + "\n" +
+                                "Longitude: " + address.getLongitude() + "\n" +
+                                "Address: " + resultData.getString(Constants.RESULT_DATA_KEY));
+                        aralık = threshold.getText().toString().trim();
+                        System.out.println("aralık :"+aralık);
+                        filtre = kategori.getText().toString().trim();
+
+
+                        Intent intphto = new Intent(getApplicationContext(), fGosterim.class);
+                        System.out.println("Giris lat :"+address.getLatitude());
+                        System.out.println("threshold giris :" + Integer.valueOf(aralık));
+                        intphto.putExtra("kategori",filtre);
+                        intphto.putExtra("lat",address.getLatitude());
+                        intphto.putExtra("long",address.getLongitude());
+                        intphto.putExtra("threshold",Double.valueOf(aralık));
+
+                        startActivity(intphto);
+                    }
+                });
+
+            }
+            else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        infoText.setVisibility(View.VISIBLE);
+                        infoText.setText(resultData.getString(Constants.RESULT_DATA_KEY));
+                    }
+                });
+            }
+        }
+    }
+}
+//Login.java
+
+package com.example.nilufer.dataekleme;
+
+import android.Manifest;
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+public class Login extends AppCompatActivity {
+
+    EditText name,tPassword;
+    Button btnLogin,btnRegister,btnPass;
+    DatabaseReference databaseReference;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        ActivityCompat.requestPermissions(Login.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        name=(EditText) findViewById(R.id.tEmail);
+        tPassword=(EditText) findViewById(R.id.tPassword);
+        btnLogin=(Button) findViewById(R.id.btnLogin);
+        btnRegister=(Button) findViewById(R.id.btnRegister);
+        btnPass=(Button) findViewById(R.id.btnPass);
+        databaseReference=FirebaseDatabase.getInstance().getReference("users");
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String pwd= null;
+                try {
+                    System.out.println("gecti1");
+                    pwd = Guvenlik.encrypt(tPassword.getText().toString());
+                    System.out.println("gecti2");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                logIn(name.getText().toString(),pwd);
+                System.out.println("gecti3");
+            }
+        });
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intphto =new Intent(getApplicationContext(),Kayit.class);
+                startActivity(intphto);
+            }
+        });
+        btnPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intphto =new Intent(getApplicationContext(),SifreIslemleri.class);
+                startActivity(intphto);
+            }
+        });
+
+    }
+
+    private void logIn(final String id,final String password) {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child(id).exists()){
+                    if (!id.isEmpty()){
+                        User user=dataSnapshot.child(id).getValue(User.class);
+                        if (user.getPassword().equals(password)){
+                            Toast.makeText(Login.this,"Giriş başarılı!",Toast.LENGTH_LONG).show();
+                            Intent intphto =new Intent(getApplicationContext(),GirisSayfası.class);
+                            startActivity(intphto);
+                        }else {
+                            Toast.makeText(Login.this,"Hatalı şifre!",Toast.LENGTH_LONG).show();
+                        }
+                    }else {
+                        Toast.makeText(Login.this,"Kullanıcı kayıtlı değil!",Toast.LENGTH_LONG).show();
+                    }
+
+                }else {
+                    Toast.makeText(Login.this,"Kullanıcı kayıtlı değil!",Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+}
+
+//activity_fgosterim.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fGosterim">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
+//activity_login.xml
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Login">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="112dp"
+        tools:layout_editor_absoluteY="16dp"
+        tools:ignore="MissingConstraints">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:src="@mipmap/ic_launcher_round"
+            android:layout_width="match_parent"
+            android:layout_height="183dp" />
+
+        <EditText
+            android:id="@+id/tEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Kullanıcı Adı" />
+
+        <EditText
+            android:id="@+id/tPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Şifre"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Giriş" />
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kayıt Ol" />
+
+        <Button
+            android:id="@+id/btnPass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Şifre İşlemleri" />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
+//activity_register.xml
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Kayit">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="368dp"
+        android:layout_height="495dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:textAlignment="center"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+
+
+        <EditText
+            android:id="@+id/tName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="Name" />
+
+        <EditText
+            android:id="@+id/tPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:hint="Password" />
+        <EditText
+            android:id="@+id/tConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:hint="Confirm Password" />
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Register" />
+        <Button
+            android:id="@+id/btnShow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Data" />
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
+//activity_sayfa.xml
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <EditText
+        android:id="@+id/adress"
+        android:layout_width="327dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="22dp"
+        android:layout_marginEnd="53dp"
+        android:layout_marginStart="16dp"
+        android:hint="Adres"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/latitudeEdit" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="255dp"
+        android:layout_height="38dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginStart="65dp"
+        android:layout_marginTop="10dp"
+        android:text="Uygulamamıza Hoşgeldiniz!!!"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/threshold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/threshold"
+        android:layout_width="327dp"
+        android:layout_height="41dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="53dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="threshold"
+        android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/kategori"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <EditText
+        android:id="@+id/kategori"
+        android:layout_width="326dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="53dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:ems="10"
+        android:hint="Kategori"
+        android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/longitudeEdit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.272"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/threshold" />
+
+    <EditText
+        android:id="@+id/longitudeEdit"
+        android:layout_width="326dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="9dp"
+        android:layout_marginEnd="53dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:hint="Long"
+        android:inputType="numberDecimal|numberSigned"
+        app:layout_constraintBottom_toTopOf="@+id/latitudeEdit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.296"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/kategori" />
+
+    <EditText
+        android:id="@+id/latitudeEdit"
+        android:layout_width="327dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginEnd="53dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:hint="Lat"
+        android:inputType="numberDecimal|numberSigned"
+        app:layout_constraintBottom_toTopOf="@+id/adress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.28"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/longitudeEdit" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+
+        android:layout_marginBottom="9dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/search"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/adress">
+
+        <RadioButton
+            android:id="@+id/radioLocation"
+            android:layout_width="100dp"
+            android:layout_weight="1"
+            android:checked="true"
+
+            android:onClick="onRadioButtonClicked"
+            android:text="use_location" />
+
+        <RadioButton
+            android:id="@+id/radioAddress"
+            android:layout_weight="1"
+            android:onClick="onRadioButtonClicked"
+            android:text="use_address"
+            tools:text="use_address" />
+        <RadioButton
+            android:id="@+id/gpsRadio"
+            android:layout_weight="1"
+            android:onClick="onRadioButtonClicked"
+            android:text="GPS"
+            tools:text="GPS" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/infoText"
+        android:layout_width="377dp"
+        android:layout_height="31dp"
+        android:layout_marginBottom="26dp"
+        android:layout_marginEnd="7dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search" />
+
+    <Button
+        android:id="@+id/search"
+        android:layout_width="219dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginStart="65dp"
+        android:layout_marginTop="9dp"
+        android:text="ARA"
+        app:layout_constraintBottom_toTopOf="@+id/infoText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+</android.support.constraint.ConstraintLayout>
+
+//activity_showdata.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Showdata">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/listviewtxt"
+            android:layout_width="match_parent"
+            android:layout_height="510dp"
+            android:layout_alignParentTop="true"></ListView>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btnUpdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update"/>
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete"/>
+    </LinearLayout>
+
+</LinearLayout>
+//activity_update.xml
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SifreIslemleri">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="368dp"
+        android:layout_height="495dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="68dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Şifre Değiştir"
+            android:textAlignment="center"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/tName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="İsim"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/tPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Şifre"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/tConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Şifrenizi tekrar giriniz"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/btnUpadate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
+
+//activity_single_item.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/firmaID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FirmaID"
+        android:textSize="18sp"/>
+
+
+    <TextView
+        android:id="@+id/firmaAdi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="firmaAdi"/>
+
+    <TextView
+        android:id="@+id/firmaLokasyon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="firmaLokasyon"/>
+    <TextView
+        android:id="@+id/kampanyaİcerigi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="kampanyaİcerigi"/>
+    <TextView
+        android:id="@+id/kampanyaSuresi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="kampanyaSuresi"
+
+        />
+</LinearLayout>
+//App.js
+
+import React, { Component } from 'react';
+import axios from 'axios';
+import './App.css';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      buyItems: [],
+      message: '',
+    }
+  }
+
+  componentDidMount() {
+    return axios.get('https://us-central1-api1-13f97.cloudfunctions.net/getItems').then((response) => {
+      this.setState({
+        buyItems: response.data
+      })
+    })
+  }
+
+  addItem(event) {
+    event.preventDefault()
+    const { buyItems } = this.state;
+
+ 	const firmaAdi = this.firmaAdi.value;
+ 	const firmaLokasyon = this.firmaLokasyon.value;
+ 	const kampanyaIcerigi = this.kampanyaIcerigi.value;
+ 	const kampanyaSuresi = this.kampanyaSuresi.value;
+	
+	
+
+
+    const isOnTheList = buyItems.includes(firmaAdi,firmaLokasyon,kampanyaIcerigi,kampanyaSuresi)
+
+    if (firmaAdi.length == 0  || firmaLokasyon.length == 0 || kampanyaIcerigi.length == 0 || kampanyaSuresi.length == 0 ) {
+      this.setState({
+        message: 'Tüm alanları doldurunuz!!!'
+      })
+
+    } else {
+      return  axios.post('https://us-central1-api1-13f97.cloudfunctions.net/addItem', { firmaAdi: firmaAdi,firmaLokasyon: firmaLokasyon,kampanyaIcerigi: kampanyaIcerigi,kampanyaSuresi: kampanyaSuresi }).then((response) => {
+        this.setState({
+          buyItems: response.data,
+          message: ''
+        })
+        this.addForm.reset()
+      })
+    }
+
+  }
+
+  removeItem(item){
+    const newBuyItems = this.state.buyItems.filter(buyItems => {
+      return item !== buyItems
+    })
+
+    return axios.delete(`https://us-central1-shop-list-b60aa.cloudfunctions.net/deleteItem?id=${item.id}`).then((response) => {
+      this.setState({
+        buyItems: response.data
+      })
+    })
+
+    if(newBuyItems.length === 0){
+      this.setState({
+        message: 'No Item on the list, add some'
+      })
+    }
+  }
+
+ 
+
+  renderItems() {
+    let id = 1;
+    const { buyItems, message } = this.state;
+
+    return (
+      buyItems.length > 0 &&
+      <table className="table">
+        <caption>Kampanya Listesi</caption>
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+			 <th scope="col">firmaAdi</th>
+			 <th scope="col">firmaLokasyon</th>
+			 <th scope="col">kampanyaIcerigi</th>
+			 <th scope="col">kampanyaSuresi</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          {
+            buyItems.map(firmaAdi => {
+              return (
+                <tr key={firmaAdi.id}>
+				<th scope="row">{id++}</th>
+                  <td>{firmaAdi.firmaAdi}</td>
+                  <td>{firmaAdi.firmaLokasyon}</td>
+                  <td>{firmaAdi.kampanyaIcerigi}</td>
+                  <td>{firmaAdi.kampanyaSuresi}</td>
+
+									
+                  
+                </tr>
+               
+              )
+            })
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+           
+           
+          </tr>
+        </tfoot>
+      </table>
+    )
+  }
+
+
+
+  render() {
+    const { buyItems, message } = this.state;
+    return (
+      <div className="container">
+        <h1>Kampanya Listesi</h1>
+        <div className="content">
+
+          <form ref={input => {this.addForm = input}} className="form-inline" onSubmit={this.addItem.bind(this)}>
+           <div className="form-group">
+              <p><label htmlFor="newItemInput" className="sr-only">Yeni Kampanya Ekleme Kısımı</label></p> 
+              
+			<p>Firma Adi      : <input ref={input => {this.firmaAdi = input}}
+                type="text" className="form-control" id="firmaAdi" /></p> 
+			<p>Firma Lokasyon : <input ref={input => {this.firmaLokasyon = input}}
+						    type="text" className="form-control" id="firmaLokasyon" /></p> 
+			<p>Kampanya Iceriği : <input ref={input => {this.kampanyaIcerigi = input}}
+						    type="text" className="form-control" id="kampanyaIcerigi" /></p> 
+			<p>Kampanya Suresi : <input ref={input => {this.kampanyaSuresi = input}}
+						    type="text" className="form-control" id="kampanyaSuresi" />	</p> 
+
+            </div>
+            <p><p><p><button className="btn btn-primary">Add</button></p> </p> </p> 
+          </form>
+          {
+            (message !== '' || buyItems.length === 0) && <p className="message text-danger">{message}</p>
+          }
+
+         {this.renderItems()}
+
+        </div>
+      </div>
+    );
+  }
+}
+
+export default App;
+///index.js
+const functions = require("firebase-functions");
+const cors = require('cors')({ origin: true });
+const admin = require('firebase-admin');
+
+admin.initializeApp();
+
+const database = admin.database().ref('/firmalar');
+
+exports.helloWorld = functions.https.onRequest((request, response) => {
+  response.send("Hello from a Severless Database!");
+});
+
+
+exports.addItem = functions.https.onRequest((req, res) => {
+  return cors(req, res, () => {
+    if(req.method !== 'POST') {
+      return res.status(401).json({
+        message: 'Not allowed'
+      })
+    }
+    let item = [];	
+	let id = 0;
+	database.orderByKey().limitToLast(1).on('child_added',function(snapshot) {
+		id =	snapshot.val().firmaId+1;
+
+	});
+  
+    const firmaId = id
+	const firmaAdi = req.body.firmaAdi
+	const firmaLokasyon = req.body.firmaLokasyon
+	const kampanyaIcerigi = req.body.kampanyaIcerigi
+	const kampanyaSuresi = req.body.kampanyaSuresi
+	 item.push({
+		 
+          firmaId,
+		  firmaAdi,
+		  firmaLokasyon,
+		  kampanyaIcerigi,
+		  kampanyaSuresi  });
+		 
+
+    database.push({ firmaId,firmaAdi,firmaLokasyon,kampanyaIcerigi,kampanyaSuresi });
+
+    let items = [];
+
+   	database.once("value").then(snap => {
+		  snap.forEach(firmaSnap => {
+
+		 items.push({
+
+          firmaId: firmaSnap.val().firmaId,
+		  firmaAdi: firmaSnap.val().firmaAdi,
+		  firmaLokasyon: firmaSnap.val().firmaLokasyon,
+		  kampanyaIcerigi: firmaSnap.val().kampanyaIcerigi,
+		  kampanyaSuresi: firmaSnap.val().kampanyaSuresi
+          
+			 });
+
+		  });
+     return res.status(200).json(items)
+
+    }, (error) => {
+      res.status(error.code).json({
+        message: `Something went wrong. ${error.message}`
+      })
+    })
+  })
+})
+
+
+exports.getItems = functions.https.onRequest((req, res) => {
+  return cors(req, res, () => {
+    if(req.method !== 'GET') {
+      return res.status(404).json({
+        message: 'Not allowed'
+      })
+    }
+
+    let items = [];
+
+	database.once("value").then(snap => {
+		  snap.forEach(firmaSnap => {
+
+		 items.push({
+
+          firmaId: firmaSnap.val().firmaId,
+		  firmaAdi: firmaSnap.val().firmaAdi,
+		  firmaLokasyon: firmaSnap.val().firmaLokasyon,
+		  kampanyaIcerigi: firmaSnap.val().kampanyaIcerigi,
+		  kampanyaSuresi: firmaSnap.val().kampanyaSuresi
+          
+			 });
+
+		  });
+     return res.status(200).json(items)
+	})
+	
+      
+
+	  	
+    }, (error) => {
+      res.status(error.code).json({
+        message: `Something went wrong. ${error.message}`
+      })
+    })
+  })

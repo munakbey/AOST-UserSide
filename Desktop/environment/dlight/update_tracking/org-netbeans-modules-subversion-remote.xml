@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.subversion.remote">
+    <module_version install_time="1475191302036" last="true" origin="installer" specification_version="1.2.3.42.1">
+        <file crc="2480990334" name="config/Modules/org-netbeans-modules-subversion-remote.xml"/>
+        <file crc="1329114227" name="modules/locale/org-netbeans-modules-subversion-remote_ja.jar"/>
+        <file crc="1201897267" name="modules/locale/org-netbeans-modules-subversion-remote_pt_BR.jar"/>
+        <file crc="4233843316" name="modules/locale/org-netbeans-modules-subversion-remote_ru.jar"/>
+        <file crc="4029567727" name="modules/locale/org-netbeans-modules-subversion-remote_zh_CN.jar"/>
+        <file crc="1670830906" name="modules/org-netbeans-modules-subversion-remote.jar"/>
+    </module_version>
+</module>

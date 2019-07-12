@@ -1,0 +1,11 @@
+ALTER TABLE deneme2 ALTER COLUMN UserPass DROP DEFAULT;
+ALTER TABLE deneme2 ALTER COLUMN UserPass SET DEFAULT '111';
+ALTER TABLE deneme2 ALTER UserPass SET DEFAULT '111';
+ALTER TABLE deneme2 ALTER COLUMN UserPass SET DEFAULT 'YES';
+UPDATE Oylama SET Puanlar = 0 ;
+UPDATE kitapoku SET  puanlar=0 ;
+ALTER TABLE Oylama MODIFY ISBN varchar(45);
+ALTER TABLE oykayit MODIFY toplamOy int;
+SET SQL_SAFE_UPDATES = 0;
+
+string proccessing-spark,kafka

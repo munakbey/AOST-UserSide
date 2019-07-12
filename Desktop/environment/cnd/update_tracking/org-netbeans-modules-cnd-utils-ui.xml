@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.cnd.utils.ui">
+    <module_version install_time="1475191308219" last="true" origin="installer" specification_version="1.5.3">
+        <file crc="1834921846" name="config/Modules/org-netbeans-modules-cnd-utils-ui.xml"/>
+        <file crc="3949969605" name="modules/locale/org-netbeans-modules-cnd-utils-ui_ja.jar"/>
+        <file crc="130969651" name="modules/locale/org-netbeans-modules-cnd-utils-ui_pt_BR.jar"/>
+        <file crc="3280883195" name="modules/locale/org-netbeans-modules-cnd-utils-ui_ru.jar"/>
+        <file crc="3749891120" name="modules/locale/org-netbeans-modules-cnd-utils-ui_zh_CN.jar"/>
+        <file crc="2465056887" name="modules/org-netbeans-modules-cnd-utils-ui.jar"/>
+    </module_version>
+</module>

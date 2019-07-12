@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.cnd.editor/1">
+    <module_version install_time="1475191327887" last="true" origin="installer" specification_version="1.31.10.1">
+        <file crc="141888542" name="config/Modules/org-netbeans-modules-cnd-editor.xml"/>
+        <file crc="186261968" name="modules/locale/org-netbeans-modules-cnd-editor_ja.jar"/>
+        <file crc="202645696" name="modules/locale/org-netbeans-modules-cnd-editor_pt_BR.jar"/>
+        <file crc="4108012052" name="modules/locale/org-netbeans-modules-cnd-editor_ru.jar"/>
+        <file crc="359144716" name="modules/locale/org-netbeans-modules-cnd-editor_zh_CN.jar"/>
+        <file crc="1477258840" name="modules/org-netbeans-modules-cnd-editor.jar"/>
+    </module_version>
+</module>

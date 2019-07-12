@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ViewHaberlerTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputText value="#{bundle.ViewHaberlerLabel_haberid}"/>
+                    <h:outputText value="#{haberlerController.selected.haberid}" title="#{bundle.ViewHaberlerTitle_haberid}"/>
+                    <h:outputText value="#{bundle.ViewHaberlerLabel_haberresim}"/>
+                    <h:outputText value="#{haberlerController.selected.haberresim}" title="#{bundle.ViewHaberlerTitle_haberresim}"/>
+                    <h:outputText value="#{bundle.ViewHaberlerLabel_haberbaslik}"/>
+                    <h:outputText value="#{haberlerController.selected.haberbaslik}" title="#{bundle.ViewHaberlerTitle_haberbaslik}"/>
+                    <h:outputText value="#{bundle.ViewHaberlerLabel_habericerik}"/>
+                    <h:outputText value="#{haberlerController.selected.habericerik}" title="#{bundle.ViewHaberlerTitle_habericerik}"/>
+                    <h:outputText value="#{bundle.ViewHaberlerLabel_haberturu}"/>
+                    <h:outputText value="#{haberlerController.selected.haberturu}" title="#{bundle.ViewHaberlerTitle_haberturu}"/>
+                    <h:outputText value="#{bundle.ViewHaberlerLabel_tarih}"/>
+                    <h:outputText value="#{haberlerController.selected.tarih}" title="#{bundle.ViewHaberlerTitle_tarih}">
+                        <f:convertDateTime pattern="MM/dd/yyyy" />
+                    </h:outputText>
+                    <h:outputText value="#{bundle.ViewHaberlerLabel_likes}"/>
+                    <h:outputText value="#{haberlerController.selected.likes}" title="#{bundle.ViewHaberlerTitle_likes}"/>
+                    <h:outputText value="#{bundle.ViewHaberlerLabel_dislike}"/>
+                    <h:outputText value="#{haberlerController.selected.dislike}" title="#{bundle.ViewHaberlerTitle_dislike}"/>
+                </h:panelGrid>
+                <br />
+                <h:commandLink action="#{haberlerController.destroyAndView}" value="#{bundle.ViewHaberlerDestroyLink}"/>
+                <br />
+                <br />
+                <h:link outcome="Edit" value="#{bundle.ViewHaberlerEditLink}"/>
+                <br />
+                <h:commandLink action="#{haberlerController.prepareCreate}" value="#{bundle.ViewHaberlerCreateLink}" />
+                <br />
+                <h:commandLink action="#{haberlerController.prepareList}" value="#{bundle.ViewHaberlerShowAllLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.ViewHaberlerIndexLink}"/>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

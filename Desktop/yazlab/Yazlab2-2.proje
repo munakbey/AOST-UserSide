@@ -1,0 +1,1973 @@
+///160201015-160201063
+//Nilüfer Tokdemir-Özge Soğukpınar
+/////////////////////////////////////////////////////////////////////////////////////////
+////Netbeans(web service) kısmı
+//ApplicationConfig.java
+package com.test;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+
+import java.util.Set;
+import javax.ws.rs.core.Application;
+
+/**
+ *
+ * @author HP
+ */
+@javax.ws.rs.ApplicationPath("webresources")
+public class ApplicationConfig extends Application {
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        Set<Class<?>> resources = new java.util.HashSet<>();
+        addRestResourceClasses(resources);
+        return resources;
+    }
+
+    /**
+     * Do not modify addRestResourceClasses() method.
+     * It is automatically populated with
+     * all resources defined in the project.
+     * If required, comment out calling this method in getClasses().
+     */
+    private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(com.test.test.class);
+        resources.add(com.test.testController.class);
+    }
+    
+    
+    
+}
+//test.java
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.test;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+/**
+ *
+ * @author HP
+ */
+@Path("test")
+public class test {
+    @GET
+    @Path("/getdata")
+    @Produces(MediaType.APPLICATION_JSON)
+    
+    
+    public String getDataInJSON(){
+        
+        return "ozgee";
+    }
+    
+}
+///testControler.java
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.test;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Properties;
+import javax.print.ServiceUIFactory;
+import javax.ws.rs.*;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+/**
+ *
+ * @author HP
+ */
+@Path("testcontroller")
+public class testController {
+    
+    
+
+    @GET
+    @Path("/getData")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ArrayList<testModel> getdataInJSON() throws ClassNotFoundException, SQLException {
+        // System.out.println(EntityResolver.class.getProtectionDomain().getCodeSource().getLocation());
+
+        ArrayList<testModel> tmm = new ArrayList<>();
+        String query = "select haberId,haberResim,haberBaslik,haberIcerik,haberTuru,tarih,likes,dislikes,viewCount from haberler order by haberId desc";
+        Connection con = null;
+        String username = "ozge";
+        String password = "12345";
+        Class.forName("org.apache.derby.jdbc.ClientDriver");
+        con = DriverManager.getConnection("jdbc:derby://localhost:1527/haber", username, password);
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        while (rs.next()) {
+            testModel tm = new testModel();
+            tm.setHaberID(rs.getString("haberId"));
+            tm.setHaberResim(rs.getString("haberResim"));
+            tm.setHaber_baslik(rs.getString("haberBaslik"));
+            tm.setHaber_icerik(rs.getString("haberIcerik"));
+            tm.setHaber_turu(rs.getString("haberTuru"));
+            tm.setTarih(rs.getString("tarih"));
+            tm.setLikes(rs.getInt("likes"));
+            tm.setDislike(rs.getInt("dislikes"));
+            tm.setViewCount(rs.getInt("viewCount"));
+            tmm.add(tm);
+        }
+        return tmm;
+
+    }
+
+    @GET
+    @Path("/insert")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void arayüz()
+    {
+        veriAkişi vA=new veriAkişi();
+        vA.setVisible(true);
+    }
+    
+    
+    
+    
+    public int insert( String hr, String hb, String hi, String ht,  String tr)  {
+       
+        Connection conn = null;
+
+        ArrayList<testModel> tmm = new ArrayList<>();
+        String query = "insert  into haberler(haberResim,haberBaslik,haberIcerik,haberTuru,tarih) values("+hr+","+hb+","+hi+","+ht+","+tr+")";
+        System.out.println(query);
+         String username = "ozge";
+            String password = "12345";
+        try {
+
+           
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/haber", username, password);
+            Statement st = conn.createStatement();
+              PreparedStatement pr = conn.prepareStatement("insert  into haberler(haberResim,haberBaslik,haberIcerik,haberTuru,tarih) values (?,?,?,?,?)");
+                pr.setString(1, hr);
+                pr.setString(2, hb);
+                pr.setString(3, hi);
+                pr.setString(4, ht);
+                pr.setString(5, tr);
+               
+                pr.executeUpdate();
+             veriAkişi vA=new veriAkişi();
+              vA.setVisible(false);
+
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @GET
+    @Path("/update/{id}/{nmbr}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public int update(@PathParam("id") String id, @PathParam("nmbr") String nmbr) {
+        ArrayList<testModel> tmm = new ArrayList<>();
+        Connection conn = null;
+        Statement statement = null;
+        int ıd = Integer.valueOf(id);
+        int nmb2 = Integer.valueOf(nmbr);
+        String query = "select * from haberler where haberId=" + id;
+        String username = "ozge";
+        String password = "12345";
+        try {
+
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/haber", username, password);
+
+            statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+
+            if (nmb2 == 1) {
+                rs.next();
+                int likeSayisi = rs.getInt("likes");
+                likeSayisi++;
+                String quer = "update haberler set likes =" + likeSayisi + " where haberId=" + id;
+                statement.executeUpdate(quer);
+                return 2;
+            } else if (nmb2 == 2) {
+                rs.next();
+                int dislikeSayisi = rs.getInt("dislikes");
+                dislikeSayisi++;
+                String quer = "update haberler set dislikes =" + dislikeSayisi + "where haberId=" + id;
+                statement.executeUpdate(quer);
+
+            } else if (nmb2 == 3) {
+                rs.next();
+                int viewCount = rs.getInt("viewCount");
+                viewCount++;
+                String quer = "update haberler set viewCount =" + viewCount + "where haberId=" + id;
+                statement.executeUpdate(quer);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return 1;
+    }
+
+    @GET
+    @Path("/newnews/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ArrayList<testModel> newnews(@PathParam("id") String id) {
+        ArrayList<testModel> tmm = new ArrayList<>();
+        Connection conn = null;
+        Statement statement = null;
+        String query = "select * from haberler where haberId >" + id + "order by haberId desc";
+        String username = "ozge";
+        String password = "12345";
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/haber", username, password);
+
+            statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                testModel tm = new testModel();
+                tm.setHaberID(rs.getString("haberId"));
+                tm.setHaberResim(rs.getString("haberResim"));
+                tm.setHaber_baslik(rs.getString("haberBaslik"));
+                tm.setHaber_icerik(rs.getString("haberIcerik"));
+                tm.setHaber_turu(rs.getString("haberTuru"));
+                tm.setTarih(rs.getString("tarih"));
+                tm.setLikes(rs.getInt("likes"));
+                tm.setDislike(rs.getInt("dislikes"));
+                tm.setViewCount(rs.getInt("viewCount"));
+                tmm.add(tm);
+
+            }
+            return tmm;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @GET
+    @Path("/returncount")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String returncount() {
+        Connection conn = null;
+        Statement statement = null;
+        String query = "SELECT COUNT(*) FROM haberler";
+
+        String username = "ozge";
+        String password = "12345";
+        try {
+
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/haber", username, password);
+            int sayac = 0;
+            statement = (Statement) conn.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+
+            while (rs.next()) {
+                sayac = rs.getInt(1);
+
+            }
+            return Integer.toString(sayac);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "aa";
+        }
+    }
+
+}
+//testModel.java
+package com.test;
+
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+
+/**
+ *
+ * @author HP
+ */
+public class testModel {
+    private String haber;
+    private String haberID;
+    private String haberResim;
+    private String haber_baslik;
+    private String haber_icerik;
+    private String haber_turu;
+    private String tarih;
+    private int likes;
+    private int dislike;
+    private int viewCount;
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
+    
+     public String getHaberID() {
+        return haberID;
+    }
+
+    public void setHaberID(String haberID) {
+        this.haberID = haberID;
+    }
+
+    public String getHaberResim() {
+        return haberResim;
+    }
+
+    public void setHaberResim(String haberResim) {
+        this.haberResim = haberResim;
+    }
+
+    public String getHaber_baslik() {
+        return haber_baslik;
+    }
+
+    public void setHaber_baslik(String haber_baslik) {
+        this.haber_baslik = haber_baslik;
+    }
+
+    public String getHaber_icerik() {
+        return haber_icerik;
+    }
+
+    public void setHaber_icerik(String haber_icerik) {
+        this.haber_icerik = haber_icerik;
+    }
+
+    public String getHaber_turu() {
+        return haber_turu;
+    }
+
+    public void setHaber_turu(String haber_turu) {
+        this.haber_turu = haber_turu;
+    }
+
+    public String getTarih() {
+        return tarih;
+    }
+
+    public void setTarih(String tarih) {
+        this.tarih = tarih;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getDislike() {
+        return dislike;
+    }
+
+    public void setDislike(int dislike) {
+        this.dislike = dislike;
+    }
+    
+    
+}
+//veriAkışı.java
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.test;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import org.apache.http.ParseException;
+
+/**
+ *
+ * @author nilufer
+ */
+public class veriAkişi extends javax.swing.JFrame {
+
+    /**
+     * Creates new form veriAkişi
+     */
+    public veriAkişi() {
+        initComponents();
+
+        this.setLocationRelativeTo(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        resimTxt = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        baslikTxt = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        icerikTxt = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        turTxt = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        tarihTxt = new javax.swing.JTextField();
+        submitBtn = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        jLabel1.setText("HABER EKLEME BÖLÜMÜ");
+
+        jLabel2.setText("Haber Resimi :");
+
+        jLabel3.setText("Haber Başlığı :");
+
+        jLabel4.setText("Haber İçeriği :");
+
+        jLabel5.setText("Haber Türü :");
+
+        jLabel6.setText("Yayınlanma Tarihi :");
+
+        submitBtn.setText("Kaydet");
+        submitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                submitBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(244, 244, 244)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(95, 95, 95)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(turTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tarihTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(resimTxt)
+                                .addComponent(baslikTxt)
+                                .addComponent(icerikTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)))))
+                .addContainerGap(165, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(41, 41, 41))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel1)
+                .addGap(43, 43, 43)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(resimTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(baslikTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(56, 56, 56)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(icerikTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(turTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(40, 40, 40)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tarihTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(29, 29, 29)
+                .addComponent(submitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void submitBtnActionPerformed(java.awt.event.ActionEvent evt) {                                          
+
+         if (!tarihTxt.getText().isEmpty()) {
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            formatter.setLenient(false);
+            try {
+               
+                java.util.Date date =  formatter.parse(tarihTxt.getText());
+            } catch (ParseException e) {
+                JOptionPane.showMessageDialog(null, "TARİH FORMATINIZ YANLIŞ YADA DOĞRU DEĞİL/(yyyy-MM-dd)");
+            } catch (java.text.ParseException ex) {
+                JOptionPane.showMessageDialog(null, "TARİH FORMATINIZ YANLIŞ YADA DOĞRU DEĞİL/(yyyy-MM-dd)");
+            } 
+        }
+        
+        if (baslikTxt.getText().isEmpty() || icerikTxt.getText().isEmpty() || resimTxt.getText().isEmpty() || tarihTxt.getText().isEmpty() || turTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "BOŞ ALAN BIRAKMAYINIZ");
+        }  else {
+            String username = "ozge";
+            String password = "12345";
+
+            int checkValue = 0;
+            try {
+                Connection conn;
+                Class.forName("org.apache.derby.jdbc.ClientDriver");
+                conn = DriverManager.getConnection("jdbc:derby://localhost:1527/haber", username, password);
+                Statement st = (Statement) conn.createStatement();
+                ResultSet rs = null;
+                testController tC = new testController();
+                tC.insert(resimTxt.getText(), baslikTxt.getText(), icerikTxt.getText(), turTxt.getText(), tarihTxt.getText());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
+    }                                         
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(veriAkişi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(veriAkişi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(veriAkişi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(veriAkişi.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new veriAkişi().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JTextField baslikTxt;
+    private javax.swing.JTextField icerikTxt;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JTextField resimTxt;
+    private javax.swing.JButton submitBtn;
+    private javax.swing.JTextField tarihTxt;
+    private javax.swing.JTextField turTxt;
+    // End of variables declaration                   
+}
+//index.xhtml
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <h:head>
+        <title>Facelet Title</title>
+        <h:outputStylesheet name="css/jsfcrud.css"/>
+    </h:head>
+    <h:body>
+    <a href="http://localhost:8080/WebApplication7/faces/webresources/testcontroller/insert/" >Veri Ekle</a>        
+    </h:body>
+
+
+
+
+
+
+
+</html>
+////////////////////////////////////////////////////////////////////////////////////////////////
+//Android Kısımı
+//MainActivity.java
+package com.example.nilufer.webjson;
+
+import android.app.ActivityManager;
+import android.app.VoiceInteractor;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.support.v4.content.ContextCompat.startActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private Button sec;
+    private Button servisButon;
+
+    private TextView filtre;
+    private static String flt;
+    private static final String URL_DATA="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/getData";
+    private static  String URL_Like="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+    private static  String URL_Dislike="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+    private List<ListItem> listItems;
+
+    private static MainActivity instance;
+
+    public static MainActivity getInstance() {
+        return instance;
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        sec = findViewById(R.id.secBtn);
+        filtre = findViewById(R.id.filtre1);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        listItems = new ArrayList<>();
+        adapter = new adapter(listItems,getApplicationContext());
+        sec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                flt=  String.valueOf(filtre.getText());
+                System.out.println("flt : "+flt);
+                loadRecyclerViewData();
+            }
+        });
+
+
+
+
+        System.out.println("saddasdasd");
+
+        recyclerView.setAdapter(adapter);
+        servisButon = (Button) findViewById(R.id.button);//Butonu tanımlıyoruz.
+
+
+        if (servisCalisiyormu()) {//Servis Çalışıyor mu kontrol
+            servisButon.setText("Servisi Durdur");
+        } else {
+            servisButon.setText("Servisi Başlat");
+        }
+
+        servisButon.setOnClickListener(new View.OnClickListener() {//Buton a clicklistener ekliyoruz
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                Log.d("Servis Çalışıyor mu", "" + servisCalisiyormu());
+                if (servisCalisiyormu()) {//Servis çalışıyorsa
+                    Intent intent = new Intent(getApplicationContext(), NotificationService.class);
+                    stopService(intent);//servisi durdurur
+                    servisButon.setText("Servisi Başlat");
+
+                } else {//Servis çalışmıyorsa
+
+                    Intent intent = new Intent(getApplicationContext(), NotificationService.class);
+                    startService(intent);//Servisi başlatır
+                    servisButon.setText("Servisi Durdur");
+                }
+            }
+        });
+
+    }
+    public boolean servisCalisiyormu(){//Servis Çalışıyor mu kontrol eden fonksiyon
+
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if ( NotificationService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
+    public void loadRecyclerViewData(){
+        System.out.println("method kısımı");
+        StringRequest stringRequest=new StringRequest(Request.Method.GET, URL_DATA,
+                new Response.Listener<String>() {
+
+
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+
+                            //JSONObject jsonObject=new JSONObject(response);
+                            JSONArray array=new JSONArray(response);
+                            System.out.println("response kısımı : "+response);
+                            System.out.println("fetch kısımı");
+                            for (int i=0;i<array.length();i++)
+                            {
+                                JSONObject object=array.getJSONObject(i);
+                                ListItem item=new ListItem(object.getInt("dislike"),object.getString("haberResim"),
+                                        object.getString("haber_baslik"),object.getString("haber_icerik"),object.getString("haber_turu")
+                                        ,object.getInt("likes"),String.valueOf(object.getString("tarih")),object.getInt("viewCount"),object.getInt("haberID")
+                                );
+                                System.out.println("dislike :"+object.getInt("dislike")+"haberId :"+object.getString("haberID")+"haberResim :"+object.getString("haberResim")+
+                                        "haberBaslik :"+object.getString("haber_baslik")+"haberDesc :"+object.getString("haber_icerik")+"haberTuru :"+object.getString("haber_turu")+
+                                        "likes"+object.getInt("likes")+"tarih :"+object.getString("tarih"));
+                               if(flt != null && flt.equalsIgnoreCase(object.getString("haber_turu"))){
+                                   listItems.add(item);
+                               }
+
+                               if(flt.isEmpty()){
+                                   listItems.add(item);
+                               }
+
+                                System.out.println(item);
+                                adapter.notifyDataSetChanged();
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        );
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+
+    }
+}
+////news.java
+package com.example.nilufer.webjson;
+
+import android.content.Context;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class news extends AppCompatActivity {
+
+    public ImageView resim;
+    public TextView content;
+    public TextView title;
+    public TextView haberTur;
+    public TextView tarih;
+    public Button like;
+    public Button dislike;
+    public TextView viewCount;
+    private static final String URL_DATA="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/getData";
+    private String URL_LikeDislike="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+    public static int haberID;
+    private Context context;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_news);
+        resim = findViewById(R.id.image);
+        title =findViewById(R.id.haberTitle);
+        content =findViewById(R.id.content);
+        haberTur=findViewById(R.id.turu);
+        tarih=findViewById(R.id.tarih);
+        like=findViewById(R.id.like);
+        dislike=findViewById(R.id.dislike);
+        viewCount=findViewById(R.id.viewCount);
+        addLikeDislike(URL_LikeDislike,3);
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addLikeDislike(URL_LikeDislike,1);
+                dislike.setEnabled(false);
+
+            }
+        });
+        dislike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addLikeDislike(URL_LikeDislike,2);
+                like.setEnabled(false);
+            }
+        });
+
+       getIntentExtras();
+
+
+    }
+
+
+    public void addLikeDislike(String URL,int nbmr){
+        String UrlLikes = URL_LikeDislike +getIntent().getIntExtra("haberID",0)+"/"+nbmr;
+        StringRequest stringRequest=new StringRequest(Request.Method.GET,UrlLikes,
+                new Response.Listener<String>() {
+
+
+                    @Override
+                    public void onResponse(String response) {
+                        loadData();
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        );
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+
+
+    }
+    public void loadData(){
+        String UrlLikes = URL_LikeDislike +getIntent().getIntExtra("haberID",0)+"/"+1;
+        StringRequest stringRequest=new StringRequest(Request.Method.GET, URL_DATA,
+                new Response.Listener<String>() {
+
+
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+
+                            //JSONObject jsonObject=new JSONObject(response);
+                            JSONArray array=new JSONArray(response);
+                            System.out.println("response kısımı : "+response);
+                            System.out.println("fetch kısımı");
+                            for (int i=0;i<array.length();i++)
+                            {
+                                JSONObject object=array.getJSONObject(i);
+                                ListItem item=new ListItem(object.getInt("dislike"),object.getString("haberResim"),
+                                        object.getString("haber_baslik"),object.getString("haber_icerik"),object.getString("haber_turu")
+                                        ,object.getInt("likes"),String.valueOf(object.getString("tarih")),object.getInt("viewCount"),object.getInt("haberID")
+                                );
+                                System.out.println("dislike :"+object.getInt("dislike")+"haberId :"+object.getString("haberID")+"haberResim :"+object.getString("haberResim")+
+                                        "haberBaslik :"+object.getString("haber_baslik")+"haberDesc :"+object.getString("haber_icerik")+"haberTuru :"+object.getString("haber_turu")+
+                                        "likes"+object.getInt("likes")+"tarih :"+object.getString("tarih"));
+                                if (haberID == object.getInt("haberID")){
+                                setImage(object.getString("haberResim"),object.getString("haber_baslik"),object.getString("haber_icerik"),object.getString("haber_turu"),object.getString("tarih"),object.getInt("dislike"),object.getInt("likes"),object.getInt("viewCount"));
+
+                                }
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        );
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+
+
+    }
+    public void getIntentExtras()
+    {
+        if (getIntent().hasExtra("aUrl" ) && getIntent().hasExtra("haberTitle")){
+            String url=getIntent().getStringExtra("aUrl");
+            String title=getIntent().getStringExtra("haberTitle");
+            String icerik=getIntent().getStringExtra("haberIcerik");
+            String haberTuru=getIntent().getStringExtra("haberTuru");
+            String tarih=getIntent().getStringExtra("haberTarih");
+            int dislike=getIntent().getIntExtra("haberDislike",0);
+            int like=getIntent().getIntExtra("haberLikes",0);
+            int view=getIntent().getIntExtra("haberG",0);
+            haberID=getIntent().getIntExtra("haberID",0);
+            System.out.println(dislike);
+            setImage(url,title,icerik,haberTuru,tarih,dislike,like,view);
+
+        }
+
+    }
+    public void setImage(String aUrl,String haberTitle,String haberIcerik,String haberTuru,String haberTarih,int haberDislike,int haberLike,int view)
+    {
+        Context context = news.this;
+
+        Picasso.with(context)
+                .load(aUrl)
+                .fit()
+                .into(resim, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        System.out.println("başarılı2");
+                        // Log something here eg "true"
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+        title.setText(haberTitle);
+        content.setText(haberIcerik);
+        haberTur.setText(haberTuru);
+        tarih.setText(haberTarih);
+        System.out.println(haberDislike);
+        dislike.setText("Dislike"+String.valueOf(haberDislike));
+        like.setText("Like :"+String.valueOf(haberLike));
+        viewCount.setText("Goruntulenma Sayısı"+String.valueOf(view));
+    }
+
+
+
+}
+//ListItem.java
+package com.example.nilufer.webjson;
+
+import java.util.Date;
+
+public class ListItem {
+    private int haberID;
+    private String haberResim;
+    private String haberBaslik;
+    private String haberIcerik;
+    private String haberTuru;
+    private String tarih;
+    private int likes;
+    private int dislike;
+    private int viewCount;
+
+   /* public ListItem(int haberID, String haberResim, String haberBaslik, String haberIcerik, String haberTuru, String tarih, int likes, int dislike) {
+        this.haberID = haberID;
+        this.haberResim = haberResim;
+        this.haberBaslik = haberBaslik;
+        this.haberIcerik = haberIcerik;
+        this.haberTuru = haberTuru;
+        this.tarih = tarih;
+        this.likes = likes;
+        this.dislike = dislike;
+    }*/
+
+    public ListItem(int dislike,String haberResim,String haber_baslik, String haber_icerik, String haber_turu, int likes,String tarih,int viewCount,int haberID) {
+        this.dislike = dislike;
+        this.haberResim = haberResim;
+        this.haberID = haberID;
+        this.haberBaslik = haber_baslik;
+        this.haberIcerik = haber_icerik;
+        this.haberTuru = haber_turu;
+        this.likes = likes;
+        this.tarih = tarih;
+        this.viewCount = viewCount;
+
+
+    }
+
+    public int getHaberID() {
+        return haberID;
+    }
+
+    public void setHaberID(int haberID) {
+        this.haberID = haberID;
+    }
+
+    public String getHaberResim() {
+        return haberResim;
+    }
+
+    public void setHaberResim(String haberResim) {
+        this.haberResim = haberResim;
+    }
+
+    public String getHaberBaslik() {
+        return haberBaslik;
+    }
+
+    public void setHaberBaslik(String haberBaslik) {
+        this.haberBaslik = haberBaslik;
+    }
+
+    public String getHaberIcerik() {
+        return haberIcerik;
+    }
+
+    public void setHaberIcerik(String haberIcerik) {
+        this.haberIcerik = haberIcerik;
+    }
+
+    public String getHaberTuru() {
+        return haberTuru;
+    }
+
+    public void setHaberTuru(String haberTuru) {
+        this.haberTuru = haberTuru;
+    }
+
+    public String getTarih() {
+        return tarih;
+    }
+
+    public void setTarih(String tarih) {
+        this.tarih = tarih;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getDislike() {
+        return dislike;
+    }
+
+    public void setDislike(int dislike) {
+        this.dislike = dislike;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
+}
+//adapter
+package com.example.nilufer.webjson;
+
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
+import static android.support.v4.content.ContextCompat.startActivity;
+
+public class adapter extends RecyclerView.Adapter<adapter.ViewHolder>{
+
+    private List<ListItem> listItems;
+    private Context context;
+    private static final String URL_DATA="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/getData";
+    private String URL_Like="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+    private String URL_Dislike="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/update/";
+
+    public adapter(List<ListItem> listItems, Context context) {
+        this.listItems = listItems;
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item,viewGroup,false);
+
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
+        final ListItem listItem=listItems.get(i);
+        Picasso.with(context).setLoggingEnabled(true);
+      String aUrl=listItem.getHaberResim();
+        System.out.println("url :"+aUrl);
+        Picasso.with(context)
+                .load(aUrl)
+                .fit()
+                .into(viewHolder.imageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        System.out.println("başarılı");
+                        // Log something here eg "true"
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+        viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(context,news.class);
+                intent.putExtra("aUrl",listItem.getHaberResim());
+                intent.putExtra("haberTitle",listItem.getHaberBaslik());
+                intent.putExtra("haberIcerik",listItem.getHaberIcerik());
+                intent.putExtra("haberTuru",listItem.getHaberTuru());
+                intent.putExtra("haberTarih",listItem.getTarih());
+                intent.putExtra("haberID",listItem.getHaberID());
+                intent.putExtra("haberDislike",listItem.getDislike());
+                intent.putExtra("haberLikes",listItem.getLikes());
+                intent.putExtra("haberG",listItem.getViewCount());
+                intent.putExtra("dest",0);
+
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                context.startActivity(intent);
+            }
+        });
+        viewHolder.haberTitle.setText(listItem.getHaberBaslik());
+        viewHolder.haberDesc.setText(listItem.getHaberIcerik());
+        viewHolder.haberTuru.setText(listItem.getHaberTuru());
+        viewHolder.haberTarih.setText((CharSequence) listItem.getTarih());
+        viewHolder.goruntulenme.setText("Goruntulenme"+String.valueOf(listItem.getViewCount()));
+        viewHolder.likes.setText("Like :"+String.valueOf(listItem.getLikes()));
+        viewHolder.dislikes.setText("Dislike :"+String.valueOf(listItem.getDislike()));
+        viewHolder.haberID.setText(String.valueOf(listItem.getHaberID()));
+    }
+
+
+
+
+
+    @Override
+    public int getItemCount() {
+        return listItems.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder{
+        public ImageView imageView;
+        public TextView haberTitle;
+        public TextView haberDesc;
+        public TextView haberTuru;
+        public TextView haberTarih;
+        public TextView goruntulenme;
+        public TextView haberID;
+        public Button likes;
+        public Button dislikes;
+        public RelativeLayout relativeLayout;
+
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            imageView =(ImageView)  itemView.findViewById(R.id.imageView);
+            haberTitle = (TextView) itemView.findViewById(R.id.haberTitle);
+            haberDesc = (TextView) itemView.findViewById(R.id.haberDesc);
+            haberTuru = (TextView) itemView.findViewById(R.id.haberTuru);
+            haberTarih = (TextView) itemView.findViewById(R.id.haberTarih);
+            goruntulenme = (TextView) itemView.findViewById(R.id.viewCount);
+            haberID = (TextView) itemView.findViewById(R.id.haberId);
+            likes = (Button) itemView.findViewById(R.id.likes);
+            dislikes = (Button) itemView.findViewById(R.id.dislikes);
+            relativeLayout = (RelativeLayout) itemView.findViewById(R.id.card);
+
+
+
+        }
+    }
+}
+//NotificationService
+package com.example.nilufer.webjson;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
+
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class NotificationService extends Service {
+
+    Context context ;
+    Notification notification;
+    Timer timer;
+    String url = "http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/returncount";//post edeceğimiz deneme adresi
+    static ArrayList<Integer> myList = new ArrayList<Integer>();
+    public static List myList2 = new ArrayList<>();
+
+
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    @Override
+    public void onCreate() {//Servis startService(); metoduyla çağrıldığında çalışır
+        context = getApplicationContext();
+        Toast.makeText(this, "Servis Çalıştı.Bu Mesaj Servis Class'dan", Toast.LENGTH_LONG).show();
+
+        timer = new Timer();
+        timer.schedule(new TimerTask() {  //her 60 sn de bir bildirimGonder(); metodu çağırılır.
+            @Override
+            public void run() {
+                new arkaplan().execute(url);
+            }
+
+        }, 0, 60000);
+
+    }
+
+    class arkaplan extends AsyncTask<String,String,String> {
+        protected String doInBackground(String... params) {
+            HttpURLConnection connection = null;
+            BufferedReader br = null;
+            BufferedReader brr = null;
+
+            try {
+                URL url = new URL(params[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                InputStream is = connection.getInputStream();
+                br = new BufferedReader(new InputStreamReader(is));
+                String satir;
+                String dosya = "";
+                while ((satir = br.readLine()) != null) {
+                    Log.d("satir:", satir);
+                    dosya += satir;
+                }
+                myList.add(Integer.valueOf(dosya));
+                System.out.println("arraylistim");
+                for (int i=0;i<myList.size();i++)
+                {
+                    System.out.println("kacinci:"+i+"  .. "+myList.get(i));
+
+                }
+               /* System.out.println("mylistsize: "+myList.size());
+                System.out.println("bir onceki deger: "+ myList.get(myList.size()-2));
+                System.out.println("bir sonraki deger: "+ myList.get(myList.size()-1));*/
+                if(myList.size()>=2)
+                {
+                    int kachabereklendi;
+                    int bironceki=myList.get(myList.size()-2);
+                    int birsonraki=myList.get(myList.size()-1);
+                    if(bironceki<birsonraki)  //yeni bir veri eklenmişse
+                    {
+                        //bildirim gonder
+                        System.out.println("IFIN ICINE GIRDİİİ");
+
+                    }
+                    kachabereklendi=birsonraki-bironceki;
+                    String dosyaa = "";
+                    System.out.println("kaç haber eklendi :"+kachabereklendi);
+                    if(kachabereklendi==1)
+                    {
+                        String myurl="http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/newnews/"+(birsonraki-1);
+                        System.out.println("url : "+myurl);
+                        System.out.println("bir sonraki :"+birsonraki);
+                        URL newurl=new URL(myurl);
+                        connection = (HttpURLConnection) newurl.openConnection();
+                        connection.connect();
+                        InputStream iss = connection.getInputStream();
+                        brr = new BufferedReader(new InputStreamReader(iss));
+                        String satirr;
+
+                        while ((satirr = brr.readLine()) != null) {
+                            Log.d("satirr:", satirr);
+                            dosyaa += satirr;
+                        }
+                        System.out.println("....EKLENEN HABER DETAYİ...");
+
+                        System.out.println(dosyaa);
+
+                        JSONArray array=new JSONArray(dosyaa);
+
+                        for (int i=0;i<array.length();i++)
+                        {
+                            JSONObject object = array.getJSONObject(i);
+
+                            myList2.add(String.valueOf(object.getInt("dislike")));
+                            myList2.add(object.getString("haberID"));
+                            myList2.add(object.getString("haberResim"));
+                            myList2.add(object.getString("haber_baslik"));
+                            myList2.add(object.getString("haber_icerik"));
+                            myList2.add(object.getString("haber_turu"));
+                            myList2.add(String.valueOf(object.getInt("likes")));
+                            myList2.add(object.getString("tarih"));
+                            myList2.add(String.valueOf(object.getInt("viewCount")));
+                        }
+                        notificationcall(myList2,1);
+                    }else if(kachabereklendi>1) {
+                        for (int count = 0; count < kachabereklendi; count++) {
+                            String myurl = "http://192.168.1.13:8080/WebApplication7/faces/webresources/testcontroller/newnews/" + (bironceki+count);
+                            System.out.println("id :"+myurl);
+                            URL newurl = new URL(myurl);
+                            connection = (HttpURLConnection) newurl.openConnection();
+                            connection.connect();
+                            InputStream iss = connection.getInputStream();
+                            brr = new BufferedReader(new InputStreamReader(iss));
+                            String satirr;
+
+                            while ((satirr = brr.readLine()) != null) {
+                                Log.d("satirr:", satirr);
+                                dosyaa += satirr;
+                            }
+                            System.out.println("....EKLENEN HABER DETAYİ...");
+
+                            System.out.println(dosyaa);
+
+                            JSONArray array = new JSONArray(dosyaa);
+
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject object = array.getJSONObject(i);
+
+                                myList2.add(String.valueOf(object.getInt("dislike")));
+                                myList2.add(object.getString("haberID"));
+                                myList2.add(object.getString("haberResim"));
+                                myList2.add(object.getString("haber_baslik"));
+                                myList2.add(object.getString("haber_icerik"));
+                                myList2.add(object.getString("haber_turu"));
+                                myList2.add(String.valueOf(object.getInt("likes")));
+                                myList2.add(object.getString("tarih"));
+                                myList2.add(String.valueOf(object.getInt("viewCount")));
+                            }
+
+
+                        }
+                        notificationcall(myList2,kachabereklendi);
+                    }
+                }
+                return dosya;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return "hata";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d("posttan gelen",s);
+
+        }
+
+        public void notificationcall(List myList2,int sayi)
+        {
+            int count=0;
+            if (sayi>1)
+            {
+                    for (int i=0;i<sayi;i++)
+                    {
+
+                        Intent intent = new Intent(getApplicationContext(), news.class);
+                        intent.putExtra("aUrl", String.valueOf(myList2.get(2+(i*9))));
+                        intent.putExtra("haberTitle", String.valueOf(myList2.get(3+(i*9))));
+                        intent.putExtra("haberIcerik", String.valueOf(myList2.get(4+(i*9))));
+                        intent.putExtra("haberTuru", String.valueOf(myList2.get(5+(i*9))));
+                        intent.putExtra("haberTarih", String.valueOf(myList2.get(7+(i*9))));
+                        intent.putExtra("haberID", Integer.valueOf((String) myList2.get(1+(i*9))));
+                        intent.putExtra("haberDislike", Integer.valueOf((String) myList2.get(0+(i*9))));
+                        intent.putExtra("haberLikes", Integer.valueOf((String) myList2.get(6+(i*9))));
+                        intent.putExtra("haberG", Integer.valueOf((String) myList2.get(8+(i*9))));
+                        intent.putExtra("dest", (sayi-count));
+
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        count++;
+
+                        PendingIntent resultpendingIntent = PendingIntent.getActivity(getApplicationContext(), (i+1), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext())
+                                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                                .setSmallIcon(R.drawable.ic_launcher_background)
+                                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background))
+                                .setContentTitle("yeni bir haber eklendi")
+                                .setContentText("haberi acmak icin dokun")
+                                .setAutoCancel(true)
+                                .setContentIntent(resultpendingIntent);
+
+                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.notify((i+1), notificationBuilder.build());
+                    }
+            }else {
+
+                Intent intent = new Intent(getApplicationContext(), news.class);
+                intent.putExtra("aUrl", String.valueOf(myList2.get(2)));
+                intent.putExtra("haberTitle", String.valueOf(myList2.get(3)));
+                intent.putExtra("haberIcerik", String.valueOf(myList2.get(4)));
+                intent.putExtra("haberTuru", String.valueOf(myList2.get(5)));
+                intent.putExtra("haberTarih", String.valueOf(myList2.get(7)));
+                intent.putExtra("haberID", Integer.valueOf((String) myList2.get(1)));
+                intent.putExtra("haberDislike", Integer.valueOf((String) myList2.get(0)));
+                intent.putExtra("haberLikes", Integer.valueOf((String) myList2.get(6)));
+                intent.putExtra("haberG", Integer.valueOf((String) myList2.get(8)));
+                intent.putExtra("dest", 1);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+
+                PendingIntent resultpendingIntent = PendingIntent.getActivity(getApplicationContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext())
+                        .setDefaults(NotificationCompat.DEFAULT_ALL)
+                        .setSmallIcon(R.drawable.ic_launcher_background)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background))
+                        .setContentTitle("yeni bir haber eklendi")
+                        .setContentText("haberi acmak icin dokun")
+                        .setAutoCancel(true)
+                        .setContentIntent(resultpendingIntent);
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.notify(1, notificationBuilder.build());
+            }
+
+
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {//Servis stopService(); metoduyla durdurulduğunda çalışır
+        timer.cancel();
+        Toast.makeText(this, "Servis Durduruldu.Bu Mesaj Servis Class'dan", Toast.LENGTH_LONG).show();
+    }
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////xml dosyaları/////////////////////////////////
+//activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    tools:layout_editor_absoluteY="25dp">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="410dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <Button
+            android:id="@+id/secBtn"
+            android:layout_width="0dp"
+            android:layout_height="43dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginEnd="28dp"
+            android:layout_marginRight="28dp"
+            android:text="Seç"
+            app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.71" />
+
+        <EditText
+            android:id="@+id/filtre1"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_marginBottom="21dp"
+            android:layout_marginEnd="63dp"
+            android:layout_marginRight="63dp"
+            android:layout_marginTop="1dp"
+            android:ems="10"
+            android:hint="Haber turu seçiniz"
+            android:inputType="textPersonName"
+            app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+            app:layout_constraintEnd_toStartOf="@+id/secBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="41dp"
+            android:layout_marginBottom="13dp"
+            android:layout_marginEnd="214dp"
+            android:layout_marginLeft="82dp"
+            android:layout_marginRight="214dp"
+            android:layout_marginStart="82dp"
+            android:layout_marginTop="15dp"
+            android:text="Button"
+            app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/filtre1" />
+
+
+</android.support.constraint.ConstraintLayout>
+///activity_news.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="294dp"
+        android:layout_height="91dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="85dp"
+        app:layout_constraintBottom_toTopOf="@+id/content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/haberTitle"
+        tools:ignore="VectorDrawableCompat" />
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="292dp"
+        android:layout_height="189dp"
+        android:layout_centerInParent="true"
+        app:layout_constraintBottom_toTopOf="@+id/like"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image" />
+
+    <Button
+        android:id="@+id/like"
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/turu"
+        android:layout_alignStart="@+id/turu"
+        android:layout_alignTop="@+id/dislike"
+        android:layout_marginLeft="-56dp"
+        android:layout_marginStart="-56dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/dislike"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/content" />
+
+    <Button
+        android:id="@+id/dislike"
+        android:layout_width="149dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="83dp"
+        android:layout_marginLeft="23dp"
+        android:layout_marginStart="23dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/viewCount"
+        app:layout_constraintStart_toEndOf="@+id/like"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/turu"
+        android:layout_width="115dp"
+        android:layout_height="25dp"
+        android:layout_alignParentEnd="true"
+        app:layout_constraintBottom_toTopOf="@+id/haberTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_alignParentRight="true" />
+
+    <TextView
+        android:id="@+id/tarih"
+        android:layout_width="117dp"
+        android:layout_height="29dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="33dp"
+        android:layout_toEndOf="@+id/viewCount"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewCount"
+        android:layout_toRightOf="@+id/viewCount" />
+
+    <TextView
+        android:id="@+id/haberTitle"
+        android:layout_width="257dp"
+        android:layout_height="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp"
+        app:layout_constraintBottom_toTopOf="@+id/image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/viewCount"
+        android:layout_width="172dp"
+        android:layout_height="25dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/image"
+        android:layout_marginBottom="151dp"
+        android:layout_alignLeft="@+id/image" />
+</RelativeLayout>
+///
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="215dp"
+        android:layout_margin="5dp">
+
+        <RelativeLayout
+            android:id="@+id/card"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/dislikes"
+                android:layout_width="99dp"
+                android:layout_height="38dp"
+                android:layout_alignEnd="@+id/haberTarih"
+                android:layout_alignParentBottom="true"
+                android:text="Begenme" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="84dp"
+                android:layout_height="95dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
+                android:padding="4dp" />
+
+            <TextView
+                android:id="@+id/haberTuru"
+                android:layout_width="84dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/dislikes"
+                android:layout_alignLeft="@id/imageView"
+                android:layout_alignStart="@+id/imageView"
+                android:background="@color/colorPrimary"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/haberTarih"
+                android:layout_width="128dp"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/imageView"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="17dp"
+                android:layout_marginRight="17dp"
+                android:background="@color/colorPrimary"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/haberTitle"
+                android:layout_width="246dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
+            <Button
+                android:id="@+id/likes"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_alignTop="@+id/dislikes"
+                android:layout_toStartOf="@+id/haberTarih"
+                android:text="Begen" />
+
+            <TextView
+                android:id="@+id/haberDesc"
+                android:layout_width="253dp"
+                android:layout_height="67dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
+
+            <TextView
+                android:id="@+id/viewCount"
+                android:layout_width="93dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginBottom="48dp" />
+
+            <TextView
+                android:id="@+id/haberId"
+                android:layout_width="38dp"
+                android:layout_height="21dp"
+                android:layout_above="@+id/haberTarih"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="11dp"
+                android:layout_marginStart="11dp" />
+
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
+///////////////////////////////////////////////////////////////////////////
+///AndroidManifest
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.nilufer.webjson"
+    android:installLocation="preferExternal">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".news" />
+
+        <service android:name=".NotificationService" />
+
+        <activity
+            android:name=".newnews"
+            android:label="@string/title_activity_newnews" />
+    </application>
+
+</manifest>
+/////build.gradle(Module:app)
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.example.nilufer.webjson"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.android.volley:volley:1.0.0'
+    implementation 'com.android.support:support-v4:28.1.0'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+
+}
+android {
+    buildToolsVersion '27.0.3'
+}
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == "com.android.support") {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion "26.+"
+            }
+        }
+    }
+}
+//
+

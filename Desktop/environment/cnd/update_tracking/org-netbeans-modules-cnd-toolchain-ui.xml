@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><module codename="org.netbeans.modules.cnd.toolchain.ui">
+    <module_version install_time="1475191335282" last="true" origin="installer" specification_version="1.0.6">
+        <file crc="2563895052" name="config/Modules/org-netbeans-modules-cnd-toolchain-ui.xml"/>
+        <file crc="3240230013" name="modules/locale/org-netbeans-modules-cnd-toolchain-ui_ja.jar"/>
+        <file crc="269630790" name="modules/locale/org-netbeans-modules-cnd-toolchain-ui_pt_BR.jar"/>
+        <file crc="1123659381" name="modules/locale/org-netbeans-modules-cnd-toolchain-ui_ru.jar"/>
+        <file crc="3738572116" name="modules/locale/org-netbeans-modules-cnd-toolchain-ui_zh_CN.jar"/>
+        <file crc="210823082" name="modules/org-netbeans-modules-cnd-toolchain-ui.jar"/>
+    </module_version>
+</module>
