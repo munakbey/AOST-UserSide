@@ -1,0 +1,26 @@
+  
+<h3>Kameralar</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Plaka</th>
+            <th>Zaman</th>
+            <th>CamId</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each list }}
+            {{#each this }}
+                {{#if this.plate.length}}
+                    <tr>
+                    <td>{{ this.plate }}</td>
+                    <td>{{ this.time }}</td>
+                    <td>{{ this.camId }}</td>
+                    <td></td>
+                    </tr>
+                {{/if}}
+            {{/each}}
+        {{/each}}
+    </tbody>
+</table>

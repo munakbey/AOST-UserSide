@@ -1,0 +1,13 @@
+<h3>{{viewTitle}}</h3>
+
+<form action="/list/{{aracBilgi.plate}}" method="POST" autocomplete="off">
+    <input type="hidden" name="plate" value={{aracBilgi.plate}}>
+    <div class="form-group">
+        <input type="text" class="form-control" name="plate" placeholder="Plaka" value="{{aracBilgi.plate}}">
+    </div>
+
+    <div class="form-group">
+      <!--  <button type="submit" class="btn btn-info"><i class="fa fa-database"></i> Submit</button>   -->
+        <a class="btn btn-secondary" href="/list/06FG536"><i class="fa fa-list-alt"></i> Goruntule</a>
+    </div>
+</form>
