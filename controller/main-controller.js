@@ -5,6 +5,9 @@ var AracBilgi=mongoose.model("AracBilgi")
 var router = express.Router();
 
 router.get('/', function (req, res) {
+    for (const key in req.query) {
+        console.log(key, req.query[key])
+      }
     res.render("get-user-input", {
         viewTitle: "Kameralar"
     });
@@ -21,12 +24,15 @@ AracBilgi.find({},    {
 */
 
 router.get('/list', (req, res) => {
+   
+        console.log( req.query.plate+"---")
+      
     AracBilgi.find((err, data) => {
         if (!err) {
             res.render("list-result", {
                 list: data
                
-            } );console.log(data)
+            } );//console.log(data)
         }
         else {
             console.log('Error in camera list :' + err);
@@ -35,28 +41,15 @@ router.get('/list', (req, res) => {
 );
 });
 
-router.get('/list/:plate', (req, res) => {
-    for (const key in req.query) {
-        console.log(key, req.query[key])
-      }
-/*    AracBilgi.findById(req.params.id, (err, doc) => {
-        if (!err) {
-            res.render("list-result", {
-                viewTitle: "Update Employee",
-                list: doc
-                
-            });console.log(doc+"####");
-        }
-    });
-*/
+router.get('/plist', (req, res) => {
     AracBilgi
-    .find({plate: req.params.plate}, { 
+    .find({plate: req.query.plate}, { 
         
     }, (err, doc) => {
         res.render("list-result", {
             list: doc
             
-        });console.log(doc+"####"+res);
+        });console.log(req.params.plate+"**********");
     }).sort({time: -1});
 
 });
