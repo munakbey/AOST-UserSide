@@ -5,6 +5,8 @@ const bodyparser = require('body-parser');
 const express = require('express');
 
 const mainController=require('./controller/main-controller');
+const klnIstekController=require('./controller/kullanici-istek-controller');
+
 const Handlebars = require('handlebars')
 const expressHandlebars = require('express-handlebars');
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
@@ -24,8 +26,9 @@ app.engine('handlebars', expressHandlebars({
 app.set('view engine', 'hbs');
 
 
-app.listen(3000,() =>{
+app.listen(3001,() =>{
         console.log('STARTED...') 
 })
 
 app.use('/',mainController);
+app.use('/',klnIstekController);

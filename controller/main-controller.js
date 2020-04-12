@@ -23,16 +23,16 @@ AracBilgi.find({},    {
 })
 */
 
-router.get('/list', (req, res) => {
+router.get('/gg', (req, res) => {
    
         console.log( req.query.plate+"---")
       
     AracBilgi.find((err, data) => {
         if (!err) {
             res.render("list-result", {
-                list: data
+                gg: data
                
-            } );//console.log(data)
+            } );console.log(data)
         }
         else {
             console.log('Error in camera list :' + err);

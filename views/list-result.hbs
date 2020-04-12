@@ -1,26 +1,32 @@
   
 <h3>Kameralar</h3>
+
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Plaka</th>
-            <th>Zaman</th>
-            <th>CamId</th>
+            <th>Ortalama Hız</th>
+            <th>Alınan Mesafe</th>
+            <th>Tarih</th>
+            <input type="date" id="birthday" name="birthday">
+
             <th></th>
         </tr>
     </thead>
     <tbody>
         {{#each list }}
-            {{#each this }}
-                {{#if this.plate.length}}
+              {{#each this }}
+              {{#if this.plaka.length}}
                     <tr>
-                    <td>{{ this.plate }}</td>
-                    <td>{{ this.time }}</td>
-                    <td>{{ this.camId }}</td>
+                    <td>{{ this.plaka }}</td>
+                    <td>{{ this.hız }}</td>
+                    <td>{{ this.mesafe }}</td>
+                    <td>{{ this.tarih }}</td>
                     <td></td>
                     </tr>
-                {{/if}}
+                {{/if}} 
             {{/each}}
         {{/each}}
     </tbody>
 </table>
+
