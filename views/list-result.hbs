@@ -1,6 +1,6 @@
   
 <h3>Kameralar</h3>
-
+<!--
 <table class="table table-striped">
     <thead>
         <tr>
@@ -28,5 +28,81 @@
             {{/each}}
         {{/each}}
     </tbody>
-</table>
+</table>-->
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/2.10.6/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.css" rel="stylesheet"/>
+
+
+ <div class='col-sm-6'>
+            <div class="form-group" style="position:relative">
+                <div class='input-group date' id='datetimepicker1'>
+                    
+                    <input id="myInput" type="text" name="myInputSearches" class="form-control"  >
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+
+<label class="noResults" align="right" style="display:none; color:red"><b><i>No Match Found</i></b></label>
+
+
+<table>
+
+   
+     <thead>
+        <tr>
+            <th>Plaka</th>
+            <th>Ortalama Hız</th>
+            <th>Alınan Mesafe</th>
+            <th>Tarih</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody  id="myTable">
+        {{#each list }}
+              {{#each this }}
+              {{#if this.plaka.length}}
+                    <tr>
+                    <td>{{ this.plaka }}</td>
+                    <td>{{ this.hız }}</td>
+                    <td>{{ this.mesafe }}</td>
+                    <td id="day0">{{ this.tarih }}</td>
+                    <td></td>
+                    </tr>
+                {{/if}} 
+            {{/each}}
+        {{/each}}
+    </tbody>
+   
+ 
+  <table>
+
+      <script>
+          $(document).ready(function () {   
+   
+        $('#myInput').datetimepicker({
+            format: 'DD-MM-YYYY',
+        });
+
+        $('#myInput').on('dp.change', function (e) {
+         var rex = new RegExp($(this).val(), "i");
+        $("#myTable tr").hide();
+        $("#myTable tr").filter(function () {
+            return rex.test($(this).text());
+        }).show();
+        $(".noResults").hide();
+        if ($("#myTable tr:visible").length == 0) {
+            $(".noResults").show();
+        }
+        });  
+});
+      </script>

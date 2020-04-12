@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 var KullaniciIstek=mongoose.model("KullaniciIstek")
 
 var router = express.Router();
-
+/*
 router.get('/m', (req, res) => {
     KullaniciIstek.find({},    { 
-        "tarih" : '1970-01-01T00:00:00.000Z'
+        "tarih" :''
     },(error,data)=>{
     if(error){
         throw error;
@@ -17,7 +17,7 @@ router.get('/m', (req, res) => {
         res.json(data);
        console.log(data)
     }
-).sort({time: -1});*/
+).sort({time: -1});
 });
 
 
@@ -35,5 +35,5 @@ router.get('/list', (req, res) => {
 );
 });
 
-
+*/
 module.exports = router;

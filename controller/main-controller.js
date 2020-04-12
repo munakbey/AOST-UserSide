@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-var AracBilgi=mongoose.model("AracBilgi")
-
+var AracBilgi=mongoose.model("AracBilgi");
+var KullaniciIstek=mongoose.model("KullaniciIstek");
 var router = express.Router();
 
 router.get('/', function (req, res) {
@@ -23,14 +23,14 @@ AracBilgi.find({},    {
 })
 */
 
-router.get('/gg', (req, res) => {
+router.get('/list', (req, res) => {
    
-        console.log( req.query.plate+"---")
+        console.log( req.query.plaka+"---")
       
-    AracBilgi.find((err, data) => {
+        KullaniciIstek.find((err, data) => {
         if (!err) {
             res.render("list-result", {
-                gg: data
+                list: data
                
             } );console.log(data)
         }
@@ -42,16 +42,18 @@ router.get('/gg', (req, res) => {
 });
 
 router.get('/plist', (req, res) => {
-    AracBilgi
-    .find({plate: req.query.plate}, { 
+    KullaniciIstek
+    .find({plate: req.query.plaka}, { 
         
     }, (err, doc) => {
         res.render("list-result", {
             list: doc
             
-        });console.log(req.params.plate+"**********");
+        });console.log(req.params.plaka+"**********");
     }).sort({time: -1});
 
 });
+
+
 
 module.exports = router;
