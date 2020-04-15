@@ -15,6 +15,10 @@ const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-acce
 var app=express();
 
 app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({
+    extended: true
+}));
+
 app.set('views', path.join(__dirname, '/views/'));
 app.engine('hbs', exphbs({ extname: 'hbs', defaultLayout: 'main-layout', layoutsDir: __dirname + '/views/' }));
 //app.set('view engine', 'hbs');
@@ -31,4 +35,4 @@ app.listen(3001,() =>{
 })
 
 app.use('/',mainController);
-app.use('/',klnIstekController);
+app.use('/klnIstek',klnIstekController);

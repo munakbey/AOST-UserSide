@@ -3,37 +3,51 @@ const mongoose = require('mongoose');
 var KullaniciIstek=mongoose.model("KullaniciIstek")
 
 var router = express.Router();
-/*
-router.get('/m', (req, res) => {
-    KullaniciIstek.find({},    { 
-        "tarih" :''
-    },(error,data)=>{
-    if(error){
-        throw error;
-    }
-    console.log(data)
-})
-  /*  KullaniciIstek.find((err, data) => {
-        res.json(data);
-       console.log(data)
-    }
-).sort({time: -1});
-});
+
+router.post('/', (req, res) => {
+    insertRecord(req,res);
+ });
+
+function insertRecord(req,res){
+    var data = new KullaniciIstek();
+    data.plaka = req.body.plaka;
+    data.hız = "";
+    data.mesafe = "";
+    data.tarih = "";
+    data.save((err,doc) => {
+        if (!err)
+        //    res.redirect('/klnIstek/gg');
+            listele(req,res);
+    });
 
 
-router.get('/list', (req, res) => {  
-    KullaniciIstek.find((err, data) => {
-    if (!err) {
-        res.render("list-result", {
-            list: data
-        } );console.log(data)
-    }
-    else {
-        console.log('Error in camera list :' + err);
-    }
 }
-);
+function listele(req,res){
+
+//   sleep(9000);
+KullaniciIstek
+.find({plaka: req.body.plaka}, { 
+    
+}, (err, doc) => {
+    res.render("list-result", {
+        list: doc
+        
+    });console.log(req.body.plaka+"**********");
+}).sort({time: -1});
+
+
+}
+router.get('/list', (req, res) => {
+       listele(req,res);
 });
 
-*/
-module.exports = router;
+
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+  }
+
+ module.exports = router;
