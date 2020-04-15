@@ -4,7 +4,7 @@ var kullaniciIstekSchema = new mongoose.Schema({
     plaka: String,
     hız: String,
     mesafe: String,
-    tarih: Date
+    tarih: String
 });
 
 var KullaniciIstek=mongoose.model('KullaniciIstek', kullaniciIstekSchema);
