@@ -12,49 +12,5 @@ router.get('/', function (req, res) {
         viewTitle: "Kameralar"
     });
 })
-/*
-AracBilgi.find({},    { 
-        "time" : 1.0
-    },(error,data)=>{
-    if(error){
-        throw error;
-    }
-    console.log(data)
-})
-*/
-
-router.get('/list', (req, res) => {
-   
-        console.log( req.query.plaka+"---")
-      
-        KullaniciIstek.find((err, data) => {
-        if (!err) {
-            res.render("list-result", {
-                list: data
-               
-            } );console.log(data)
-        }
-        else {
-            console.log('Error in camera list :' + err);
-        }
-    }
-);
-});
-
-router.get('/plist', (req, res) => {
-    KullaniciIstek
-    .find({plate: req.query.plaka}, { 
-        
-    }, (err, doc) => {
-        res.render("list-result", {
-            list: doc
-            
-        });console.log(req.params.plaka+"**********");
-    }).sort({time: -1});
-
-});
-
-
-
 
 module.exports = router;
