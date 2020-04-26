@@ -35,7 +35,7 @@ KullaniciIstek
     res.render("list-result", {
         list: doc
         
-    });console.log(req.body.plaka+"**********");
+    });console.log(req.body.plaka+"----");
 }).sort({time: -1});
 
 
@@ -53,13 +53,14 @@ function sleep(milliseconds) {
     } while (currentDate - date < milliseconds);
   }
 
-router.get('/map', function (req, res) {
+router.get('/map/:lat1/:lat2/:long1/:long2', function (req, res) {
     res.render("map", {
-         x1: 33.993065,
-         y1: -117.918015,
-         x2:42.28695,
-         y2: -71.59419
+         x1: req.params.lat1,
+         y1: req.params.long1,
+         x2: req.params.lat2,
+         y2: req.params.long2
     });
+    console.log(req.params.lat1+"-"+req.params.long1+"-"+req.params.lat2+"-"+req.params.long2 )
 })
 
 
