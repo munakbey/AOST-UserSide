@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+   <head>
+      <title></title>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+      <script type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+      <script type="text/javascript">
+
+         var map = null;
+         var directionsManager = null;
+
+         function GetMap() {
+            // Initialize the map
+            map = new Microsoft.Maps.Map(document.getElementById("mapDiv"),{credentials:"AkoXVs4IadbFqpfRBg4oucZVwdeSsgB_6o-CP5OmTK8cyxfPIKr8i1X4d9doj-Tq"});
+            Microsoft.Maps.loadModule('Microsoft.Maps.Directions', { callback: directionsModuleLoaded });
+         }
+
+
+
+         function directionsModuleLoaded()
+         {
+            // Initialize the DirectionsManager
+            directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
+
+            // Create start and end waypoints
+            var startWaypoint = new Microsoft.Maps.Directions.Waypoint({location:new Microsoft.Maps.Location({{x1}},{{y1}})}); 
+            var endWaypoint = new Microsoft.Maps.Directions.Waypoint({location:new Microsoft.Maps.Location({{x2}},{{y2}} )} );
+
+            directionsManager.addWaypoint(startWaypoint);
+            directionsManager.addWaypoint(endWaypoint);
+
+            // Set request options
+            directionsManager.setRequestOptions({ avoidTraffic: true, maxRoutes: 1 });
+
+            // Set the render options
+            directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('itineraryDiv'), displayWalkingWarning: false, walkingPolylineOptions:{strokeColor: new Microsoft.Maps.Color(200, 0, 255, 0)} });
+
+            // Specify a handler for when an error occurs
+            Microsoft.Maps.Events.addHandler(directionsManager, 'directionsError', displayError);
+
+            // Calculate directions, which displays a route on the map
+            directionsManager.calculateDirections();
+         } 
+
+         function displayError(e) {
+            // Display the error message
+            alert(e.message);
+         }
+
+
+      </script>
+   </head>
+   <body onload="GetMap();">
+      <div id='mapDiv' style="position:relative; width:600px; height:600px;"></div>       
+      <div id='itineraryDiv' style="position:relative; width:400px;"></div>
+   </body>
+</html>
