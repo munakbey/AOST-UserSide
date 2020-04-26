@@ -4,6 +4,7 @@ var KullaniciIstek=mongoose.model("KullaniciIstek")
 
 var router = express.Router();
 
+
 router.post('/', (req, res) => {
     insertRecord(req,res);
  });
@@ -13,6 +14,8 @@ function insertRecord(req,res){
     data.plaka = req.body.plaka;
     data.hız = "";
     data.mesafe = "";
+    data.cam1 = "";
+    data.cam2 = "";
     data.tarih = "";
     data.save((err,doc) => {
         if (!err)
@@ -49,5 +52,15 @@ function sleep(milliseconds) {
       currentDate = Date.now();
     } while (currentDate - date < milliseconds);
   }
+
+router.get('/map', function (req, res) {
+    res.render("map", {
+         x1: 33.993065,
+         y1: -117.918015,
+         x2:42.28695,
+         y2: -71.59419
+    });
+})
+
 
  module.exports = router;

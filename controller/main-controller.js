@@ -9,7 +9,8 @@ router.get('/', function (req, res) {
         console.log(key, req.query[key])
       }
     res.render("get-user-input", {
-        viewTitle: "Kameralar"
+        viewTitle: "Kameralar",
+         name: 33.993065 
     });
 })
 
