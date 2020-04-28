@@ -1,35 +1,24 @@
   
 <h3>Kameralar</h3>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
 
-<!--
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Plaka</th>
-            <th>Ortalama Hız</th>
-            <th>Alınan Mesafe</th>
-            <th>Tarih</th>
-            <input type="date" id="birthday" name="birthday">
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
 
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {{#each list }}
-              {{#each this }}
-              {{#if this.plaka.length}}
-                    <tr>
-                    <td>{{ this.plaka }}</td>
-                    <td>{{ this.hız }}</td>
-                    <td>{{ this.mesafe }}</td>
-                    <td>{{ this.tarih }}</td>
-                    <td></td>
-                    </tr>
-                {{/if}} 
-            {{/each}}
-        {{/each}}
-    </tbody>
-</table>-->
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -44,7 +33,7 @@
             <div class="form-group" style="position:relative">
                 <div class='input-group date' id='datetimepicker1'>
                     
-                    <input id="myInput" type="text" name="myInputSearches" class="form-control"  >
+                    <input id="myInput" type="text" name="myInputSearches" class="form-control"   placeholder="Tarih Seçiniz">
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -65,7 +54,7 @@
             <th>Ortalama Hız</th>
             <th>Alınan Mesafe</th>
             <th>Tarih</th>
-            <th></th>
+            <th>Haritada Görüntüle</th>
         </tr>
     </thead>
     <tbody  id="myTable">
@@ -77,8 +66,9 @@
                     <td>{{ this.hız }}</td>
                     <td>{{ this.mesafe }}</td>
                     <td id="day0">{{ this.tarih }}</td>
-                    <td> <a href="http://localhost:3001/klnistek/map/{{ this.lat1 }}/{{this.lat2}}/{{this.long1}}/{{this.long2}}">İncele</a> </td>
-                    <td></td>
+                    <td> <a href="http://localhost:3001/klnistek/map/{{ this.lat1 }}/{{this.lat2}}/{{this.long1}}/{{this.long2}}"  class='fas fa-map-marker-alt'
+                            style="color:black">İncele</a> </td>
+                  
                     </tr>
                 {{/if}} 
             {{/each}}
