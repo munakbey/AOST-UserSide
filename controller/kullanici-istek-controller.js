@@ -27,15 +27,17 @@ function insertRecord(req,res){
 }
 function listele(req,res){
 
-//   sleep(9000);
+sleep(9000);
 KullaniciIstek
-.find({plaka: req.body.plaka}, { 
+.find({plaka: req.body.plaka  }, { 
     
 }, (err, doc) => {
-    res.render("list-result", {
-        list: doc
-        
-    });console.log(req.body.plaka+"----");
+    res.render("list-result", {  
+        list: doc,
+        plaka:doc[0].plaka,
+        hız:doc[0].hız,
+        mesafe:doc[0].mesafe          
+    }); console.log(req.body.plaka+"----");
 }).sort({time: -1});
 
 

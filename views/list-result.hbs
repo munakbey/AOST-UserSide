@@ -1,6 +1,8 @@
-  
-<h3>Kayıtlar</h3>
-<meta name='viewport' content='width=device-width, initial-scale=1'>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <script src='https://kit.fontawesome.com/a076d05399.js'></script>
 <style>
 table {
@@ -8,13 +10,11 @@ table {
   border-collapse: collapse;
   width: 100%;
 }
-
 td, th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
 }
-
 tr:nth-child(even) {
   background-color: #dddddd;
 }
@@ -26,8 +26,41 @@ tr:nth-child(even) {
 <script src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
 
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.css" rel="stylesheet"/>
+<style>
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
 
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+</style>
+</head>
+<body>
+
+<h2>Kayıtlar</h2>
+
+
+<button type="button" class="collapsible">Araç: {{plaka}}<br>Toplam Mesafe: {{mesafe}} km<br>Ortalam Hız: {{hız}} km/saat</button>
+<div class="content">
+ 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.css" rel="stylesheet"/>
+<br>
 
  <div class='col-sm-6'>
             <div class="form-group" style="position:relative">
@@ -63,6 +96,7 @@ tr:nth-child(even) {
         {{#each list }}
               {{#each this }}
               {{#if this.plaka.length}}
+              {{#if this.adres2}}
                     <tr>
                     <td>{{ this.plaka }}</td>
                     <td>{{ this.hız }}</td>
@@ -74,6 +108,7 @@ tr:nth-child(even) {
                             style="color:black">İncele</a> </td>
                   
                     </tr>
+                {{/if}}    
                 {{/if}} 
             {{/each}}
         {{/each}}
@@ -82,13 +117,37 @@ tr:nth-child(even) {
  
   <table>
 
-      <script>
+
+
+
+
+
+</div>
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
+
+
+  <script>
           $(document).ready(function () {   
    
         $('#myInput').datetimepicker({
             format: 'YYYY-MM-DD',
         });
-
         $('#myInput').on('dp.change', function (e) {
          var rex = new RegExp($(this).val(), "i");
         $("#myTable tr").hide();
@@ -103,4 +162,5 @@ tr:nth-child(even) {
 });
       </script>
 
-   
+</body>
+</html>
