@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 var kullaniciIstekSchema = new mongoose.Schema({
     plaka: String,
-    hız: String,
-    mesafe: String,
+    hız: Number,
+    mesafe: Number,
     lat1: String,
     long1: String,
     lat2:String,
