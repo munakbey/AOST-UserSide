@@ -31,3 +31,4 @@ Camera.find({},(error,data)=>{
 
 require('./aracBilgi');
 require('./kullaniciIstek');
+require('./kameras');
