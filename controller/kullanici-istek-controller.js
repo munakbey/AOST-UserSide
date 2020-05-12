@@ -8,6 +8,9 @@ var router = express.Router();
 var topHız=0 ;
 var mplaka;
 var ortalamaSure;
+var ortalamaHiz;
+var Distance = require('geo-distance');
+var store = require('store')
 
     router.post('/', (req, res) => {
         insertRecord(req,res);
@@ -85,83 +88,107 @@ router.get('/map/:plaka/:lat1/:lat2/:long1/:long2', function (req, res) {
          x2: req.params.lat2,
          y2: req.params.long2
     });
-    mplaka=req.params.plaka;
-    console.log(req.params.lat1+"-"+req.params.long1+"-"+req.params.lat2+"-"+req.params.long2 )
+   /* mplaka=req.params.plaka;
+    console.log(req.params.lat1+"-"+req.params.long1+"-"+req.params.lat2+"-"+req.params.long2 )*/
 })
 
+router.get('/ekle/:plaka/', function (req, res) {
+    res.render("add-cam", {
+       // plaka:req.body.plaka
+    });
+    mplaka=req.params.plaka;
+})
 
 router.post('/listt/', (req, res) => {
-    kaydetKamera(req,res); 
+ // kameraKaydetme(req,res,req.body.lat1,req.body.long1);
+ //  kameraKaydetme(req,res,req.body.lat2,req.body.long2); 
+ ortalamaHızIslem(req,res); 
+
  });
 
-function kaydetKamera(req,res){
-
-    Kamera
-    .find({}, { 
-    }, (err, doc) => {
-    //  console.log(doc+"####"+res);
-
-    var newCamId=doc;  
-    
-    console.log(req.body.lat1+" *+*"+req.body.long1+" "+req.body.lat2+" "+req.body.long2+" - "+mplaka);
-    var data = new Kamera();
-
-    data.camId = newCamId+1;
-    data.lat = req.body.lat1;
-    data.long = req.body.long1;
-
-    data.save((err,doc) => {
-        if (!err)
-            console.log("Kamera Eklendi")
-    });
-
-    var data = new AracBilgi();
-    data.plate = mplaka;
-    data.camId = newCamId+1;
-    data.time = "2020-05-05T22:25:13.003+00:00";
-    data.save((err,doc) => {
-        if (!err)
-             console.log("AracBilgi Eklendi")
-            //listele(req,res);
-    });
+function ortalamaHızIslem(req,res){
 
     KullaniciIstek
     .find({plaka: mplaka  }, { 
     }, (err, doc) => {
+        if(!err){
         res.render("list-result", {  
             list: doc,
             
-        }); console.log(doc[0].mesafe+"++++++"+mplaka)
+          }); console.log(doc[0].mesafe+"++++++"+mplaka)
         
-        ortalamaSure=(2222222)/doc[0].hız // x2=apiden gelmeli
+        console.log(req.body.lat1+" *+*"+req.body.long1+" "+req.body.lat2+" "+req.body.long2+" - "+mplaka);
+        //console.log('' + Distance('50 km').human_readable('customary'));
 
-    
-            AracBilgi
-            .find({plate: mplaka  }, { 
-            }, (err, doc) => {
-                res.render("list-result", {  
-                    list: doc,       
-                }); 
-                
-                var dbDate=doc[0].time;
-                var seconds=ortalamaSure*3600; //saniyeye çeviriyoruz
-                var parsedDate = new Date(Date.parse(dbDate))
-                var newDate = new Date(parsedDate.getTime() + (1000 * seconds))
+        // https://www.latlong.net/place/oslo-norway-14195.html: Oslo, Norway, Latitude and longitude coordinates are: 59.911491, 10.757933
+        var loc1 = {   
+          lat: req.body.lat1,
+          lon: req.body.long1
+        };
+        var loc2 = {
+          lat: req.body.lat2,
+          lon: req.body.long2
+        };
+        var loc1Toloc2 = Distance.between(loc1, loc2);
 
-                console.log(formatDate(newDate)+ "<---")
-                console.log(doc+" $$$$"+mplaka)
-                
-            }).sort({time: 1}).limit(1)
+        
+        ortalamaSure=( parseFloat(loc1Toloc2.human_readable()))/parseFloat(doc[0].hız); // x2=apiden gelmeli = t2
+        ortalamaHiz=parseFloat(loc1Toloc2.human_readable())/ortalamaSure;
+      
+        console.log(doc[0].hız + '->' +  " -> " + parseFloat(ortalamaSure) + " -> " + parseInt(loc1Toloc2.human_readable()));
+        console.log("################### mesafe:"+parseFloat(loc1Toloc2.human_readable())/ortalamaSure + " ******* " + parseFloat(loc1Toloc2.human_readable()) + " t2:"+ortalamaSure +" v1: "+parseFloat(doc[0].hız));
+        sleep(3000)
+        console.log(mplaka+" < ##")
+        
+        router.get('/', function (req, res) {
+        })
+
+    }
 }).sort({mesafe:-1}).limit(1)
 
-}).count();
+
+}
+    
+function gosterHiz(hiz){
+console.log("hiz: >>>>>>>>> "+hiz);
+    router.get('/ekle/:plaka/', function (req, res) {
+        res.render("add-cam", {
+            gg:ortalamaHiz
+        });
+        mplaka=req.params.plaka;
+    })
 
 }
 
-        
-    function formatDate(date){
-        return ('{0}-{1}-{3} {4}:{5}:{6}').replace('{0}', date.getFullYear()).replace('{1}', date.getMonth() + 1).replace('{3}', date.getDate()).replace('{4}', date.getHours()).replace('{5}', date.getMinutes()).replace('{6}', date.getSeconds())
-    }
+function kameraKaydetme(req,res,prm1,prm2){
+    Kamera
+    .find({}, { 
+    }, (err, doc) => {
+        if(!err){
+    //  console.log(doc+"####"+res);
 
+    var newCamId=doc;  
+    
+    var data = new Kamera();
+
+    data.camId = newCamId+1;
+    data.lat =prm1 //req.body.lat1;
+    data.long =prm2 //req.body.long1;
+
+    data.save((err,doc) => {
+        if (!err)
+            console.log("Kamera Eklendi")
+        else{
+            console.log("Hata!!");
+        }
+    });
+
+        }
+ }).count();  
+}
+
+function formatDate(date){
+     return ('{0}-{1}-{3} {4}:{5}:{6}').replace('{0}', date.getFullYear()).replace('{1}', date.getMonth() + 1).replace('{3}', date.getDate()).replace('{4}', date.getHours()).replace('{5}', date.getMinutes()).replace('{6}', date.getSeconds())
+}
 
  module.exports = router;

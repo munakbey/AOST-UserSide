@@ -5,49 +5,71 @@
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
       <script type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
       <script type="text/javascript">
-
          var map = null;
          var directionsManager = null;
-
-      /*   function GetMap() {
+         function GetMap() {
             // Initialize the map
-            map = new Microsoft.Maps.Map(document.getElementById("mapDiv"),{credentials:"AkoXVs4IadbFqpfRBg4oucZVwdeSsgB_6o-CP5OmTK8cyxfPIKr8i1X4d9doj-Tq"});
+            map = new Microsoft.Maps.Map(document.getElementById("myMap"),{credentials:"AkoXVs4IadbFqpfRBg4oucZVwdeSsgB_6o-CP5OmTK8cyxfPIKr8i1X4d9doj-Tq"});
             Microsoft.Maps.loadModule('Microsoft.Maps.Directions', { callback: directionsModuleLoaded });
+            Microsoft.Maps.Events.addHandler(map, 'click', displayLatLong);
+
          } 
-      */
+          function displayLatLong(e) {
+              if (e.targetType == "map") {
+                  var point = new Microsoft.Maps.Point(e.getX(), e.getY());
+
+                  var loc = e.target.tryPixelToLocation(point);
+                  document.getElementById("textBox").value= loc.latitude + ", " + loc.longitude;
+                  document.getElementById("lat1").value= loc.latitude ;
+                  document.getElementById("long1").value= loc.longitude;
+
+              }
+          }
+           function displayLatLong2(e) {
+              if (e.targetType == "map") {
+                  var point = new Microsoft.Maps.Point(e.getX(), e.getY());
+
+                  var loc = e.target.tryPixelToLocation(point);
+                  document.getElementById("textBox").value= loc.latitude + ", " + loc.longitude;
+                  document.getElementById("lat2").value= loc.latitude ;
+                  document.getElementById("long2").value= loc.longitude;
+
+              }
+          }
+         function secondLoc(number) {
+              // Initialize the map
+                map = new Microsoft.Maps.Map(document.getElementById("myMap"),
+                            {credentials:"AkoXVs4IadbFqpfRBg4oucZVwdeSsgB_6o-CP5OmTK8cyxfPIKr8i1X4d9doj-Tq"}); 
+            Microsoft.Maps.loadModule('Microsoft.Maps.Directions', { callback: directionsModuleLoaded });
+
+                //Add handler for the map click event.
+               Microsoft.Maps.Events.addHandler(map, 'click', displayLatLong2);
+          }
 
 
+      
          function directionsModuleLoaded()
          {
             // Initialize the DirectionsManager
             directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-
             // Create start and end waypoints
             var startWaypoint = new Microsoft.Maps.Directions.Waypoint({location:new Microsoft.Maps.Location({{x1}},{{y1}})}); 
             var endWaypoint = new Microsoft.Maps.Directions.Waypoint({location:new Microsoft.Maps.Location({{x2}},{{y2}} )} );
-
             directionsManager.addWaypoint(startWaypoint);
             directionsManager.addWaypoint(endWaypoint);
-
             // Set request options
             directionsManager.setRequestOptions({ avoidTraffic: true, maxRoutes: 1 });
-
             // Set the render options
             directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('itineraryDiv'), displayWalkingWarning: false, walkingPolylineOptions:{strokeColor: new Microsoft.Maps.Color(200, 0, 255, 0)} });
-
             // Specify a handler for when an error occurs
             Microsoft.Maps.Events.addHandler(directionsManager, 'directionsError', displayError);
-
             // Calculate directions, which displays a route on the map
             directionsManager.calculateDirections();
          } 
-
          function displayError(e) {
             // Display the error message
             alert(e.message);
          }
-
-
       </script>
 
       <form action="/klnistek/listt/{{lat1}}{{long1}}{{lat2}}{{long2}}"  method="POST">
@@ -65,7 +87,12 @@
 
    </head>
    <body onload="GetMap();">
-      <div id='mapDiv' style="position:relative; width:600px; height:600px;"></div>       
+      <div id='myMap' style="position:relative; width:600px; height:600px;"></div>       
+        <b>Konum seçmek için haritaya tıklayınız.</b><br>
+      Latitude, Longitude:       
+      <input id='textBox' type="text" style="width:250px;"/>
+      <button class="btn btn-primary" onclick=secondLoc() role="button">Kaydet</button>
       <div id='itineraryDiv' style="position:relative; width:400px;"></div>
+ 
    </body>
 </html>

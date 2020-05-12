@@ -14,8 +14,10 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-handlebars": "^4.0.1",
+    "geo-distance": "^0.2.0",
     "hbs": "^4.1.0",
-    "mongoose": "^5.9.7"
+    "mongoose": "^5.9.7",
+    "store": "^2.0.12"
   },
   "devDependencies": {
     "handlebars": "^4.7.4"

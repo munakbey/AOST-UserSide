@@ -1,0 +1,82 @@
+
+      <form action="/klnistek/listt/{{lat1}}{{long1}}{{lat2}}{{long2}}"  method="POST">
+         <label for="la1t">Lat:</label><br>
+         <input type="text" id="lat1" name="lat1" value="59.914"><br>
+         <label for="long1">Long:</label><br>
+         <input type="text" id="long1" name="long1" value="10.752"><br>
+
+         <label for="lat2">Lat2:</label><br>
+         <input type="text" id="lat2" name="lat2" value="52.523"><br>
+         <label for="long2">Long2:</label><br>
+         <input type="text" id="long2" name="long2" value="13.412">
+         <input type="submit" value="Submit" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.css">
+      </form>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+   <head>
+      <title></title>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+      <script type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+
+      <script type="text/javascript">
+
+         var map = null;         
+
+         function GetMap()
+         {
+             
+                // Initialize the map
+                map = new Microsoft.Maps.Map(document.getElementById("myMap"),
+                            {credentials:"AkoXVs4IadbFqpfRBg4oucZVwdeSsgB_6o-CP5OmTK8cyxfPIKr8i1X4d9doj-Tq"}); 
+
+                //Add handler for the map click event.
+               Microsoft.Maps.Events.addHandler(map, 'click', displayLatLong);
+             
+         }
+
+          function displayLatLong(e) {
+              if (e.targetType == "map") {
+                  var point = new Microsoft.Maps.Point(e.getX(), e.getY());
+
+                  var loc = e.target.tryPixelToLocation(point);
+                  document.getElementById("textBox").value= loc.latitude + ", " + loc.longitude;
+                  document.getElementById("lat1").value= loc.latitude ;
+                  document.getElementById("long1").value= loc.longitude;
+
+              }
+          }
+           function displayLatLong2(e) {
+              if (e.targetType == "map") {
+                  var point = new Microsoft.Maps.Point(e.getX(), e.getY());
+
+                  var loc = e.target.tryPixelToLocation(point);
+                  document.getElementById("textBox").value= loc.latitude + ", " + loc.longitude;
+                  document.getElementById("lat2").value= loc.latitude ;
+                  document.getElementById("long2").value= loc.longitude;
+
+              }
+          }
+         function secondLoc(number) {
+              // Initialize the map
+                map = new Microsoft.Maps.Map(document.getElementById("myMap"),
+                            {credentials:"AkoXVs4IadbFqpfRBg4oucZVwdeSsgB_6o-CP5OmTK8cyxfPIKr8i1X4d9doj-Tq"}); 
+
+                //Add handler for the map click event.
+               Microsoft.Maps.Events.addHandler(map, 'click', displayLatLong2);
+          }
+
+
+      </script>
+
+   </head>
+   <body onload="GetMap();">
+      <div id='myMap' style="position:relative; width:400px; height:400px;"></div><br>
+      <b>Konum seçmek için haritaya tıklayınız.</b><br>
+      Latitude, Longitude:       
+      <input id='textBox' type="text" style="width:250px;"/>
+      <button class="btn btn-primary" onclick=secondLoc() role="button">Kaydet</button>
+
+   </body>
+</html>
