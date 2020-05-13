@@ -11,7 +11,6 @@ var ortalamaSure;
 var ortalamaHiz;
 var Distance = require('geo-distance');
 var store = require('store')
-
     router.post('/', (req, res) => {
         insertRecord(req,res);
     });
@@ -88,27 +87,70 @@ router.get('/map/:plaka/:lat1/:lat2/:long1/:long2', function (req, res) {
          x2: req.params.lat2,
          y2: req.params.long2
     });
+
+    x1= req.params.lat1;
+    y1= req.params.long1;
+    x2= req.params.lat2;
+    y2= req.params.long2;
    /* mplaka=req.params.plaka;
     console.log(req.params.lat1+"-"+req.params.long1+"-"+req.params.lat2+"-"+req.params.long2 )*/
 })
 
 router.get('/ekle/:plaka/', function (req, res) {
     res.render("add-cam", {
-       // plaka:req.body.plaka
+        plaka:req.params.plaka
     });
-    mplaka=req.params.plaka;
+     mplaka=req.params.plaka;
+    console.log(req.body.plaka+" +++ "+ mplaka)
 })
 
 router.post('/listt/', (req, res) => {
  // kameraKaydetme(req,res,req.body.lat1,req.body.long1);
- //  kameraKaydetme(req,res,req.body.lat2,req.body.long2); 
+  //kameraKaydetme(req,res,req.body.lat2,req.body.long2); 
  ortalamaHızIslem(req,res); 
 
  });
 
 function ortalamaHızIslem(req,res){
 
-    KullaniciIstek
+    Kamera
+    .find({}, { 
+    }, (err, doc) => {
+        if(!err){
+    //  console.log(doc+"####"+res);
+
+    var newCamId=doc;  
+    
+    var data = new Kamera();
+
+    data.camId = newCamId+1;
+    data.lat =req.body.lat1;
+    data.long =req.body.long1;
+
+    data.save((err,doc) => {
+        if (!err)
+            console.log("Kamera Eklendi")
+        else{
+            console.log("Hata!!");
+        }
+    });
+
+    var mdata = new AracBilgi();
+    console.log(mplaka+"%%%%%%%%%%%5 "+req.params.plaka)
+    mdata.plate = mplaka
+    mdata.time ="2020-05-12T22:44:53.378+00:00"
+    mdata.camId =newCamId+1
+
+    mdata.save((err,doc) => {
+        if (!err)
+            console.log("Kamera Eklendi")
+        else{
+            console.log("Hata!!");
+        }
+    });
+
+
+   /* KullaniciIstek
     .find({plaka: mplaka  }, { 
     }, (err, doc) => {
         if(!err){
@@ -140,25 +182,19 @@ function ortalamaHızIslem(req,res){
         sleep(3000)
         console.log(mplaka+" < ##")
         
-        router.get('/', function (req, res) {
+        router.get('http://localhost:3001/', function (req, res) {
+            console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5");
         })
 
     }
-}).sort({mesafe:-1}).limit(1)
+}).sort({mesafe:-1}).limit(1)*/
 
+}
+}).count();  
 
 }
     
-function gosterHiz(hiz){
-console.log("hiz: >>>>>>>>> "+hiz);
-    router.get('/ekle/:plaka/', function (req, res) {
-        res.render("add-cam", {
-            gg:ortalamaHiz
-        });
-        mplaka=req.params.plaka;
-    })
 
-}
 
 function kameraKaydetme(req,res,prm1,prm2){
     Kamera
