@@ -107,8 +107,9 @@ router.get('/ekle/:plaka/', function (req, res) {
 router.post('/listt/', (req, res) => {
  // kameraKaydetme(req,res,req.body.lat1,req.body.long1);
   //kameraKaydetme(req,res,req.body.lat2,req.body.long2); 
+ 
  ortalamaHızIslem(req,res); 
-
+ res.redirect('/');
  });
 
 function ortalamaHızIslem(req,res){
@@ -136,9 +137,9 @@ function ortalamaHızIslem(req,res){
     });
 
     var mdata = new AracBilgi();
-    console.log(mplaka+"%%%%%%%%%%%5 "+req.params.plaka)
+    console.log(mplaka+"%%%%%%%%%%%5 "+req.params.plaka+ +" --- "+ req.body.time)
     mdata.plate = mplaka
-    mdata.time ="2020-05-12T22:44:53.378+00:00"
+    mdata.time =req.body.time
     mdata.camId =newCamId+1
 
     mdata.save((err,doc) => {
